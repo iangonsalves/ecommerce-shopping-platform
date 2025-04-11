@@ -15,22 +15,30 @@ ecommerce-shopping-platform/
 │   │       └── User.php
 │   ├── database/
 │   │   └── migrations/
-│   │       └── 2024_03_19_000000_create_users_table.php
-│   ├── routes/
-│   │   └── api.php
-│   └── .env
+│   └── routes/
+│       └── api.php
 │
-└── frontend/                # React frontend
+└── frontend/               # React frontend
     ├── src/
-    │   ├── pages/
+    │   ├── components/    # Reusable components
+    │   │   ├── common/    # Common UI components
+    │   │   │   ├── AlertMessage.jsx
+    │   │   │   └── LoadingButton.jsx
+    │   │   ├── form/     # Form-specific components
+    │   │   │   └── FormTextField.jsx
+    │   │   └── layout/   # Layout components
+    │   │       └── PageContainer.jsx
+    │   ├── hooks/        # Custom React hooks
+    │   │   └── useForm.js
+    │   ├── features/     # Redux features/slices
+    │   │   └── auth/
+    │   │       └── authSlice.js
+    │   ├── pages/        # Page components
     │   │   ├── Login.jsx
     │   │   └── Register.jsx
-    │   ├── store/
-    │   │   └── authSlice.js
-    │   ├── services/
+    │   ├── services/     # API services
     │   │   └── api.js
     │   └── App.jsx
-    └── package.json
 ```
 
 ## Features Implemented (Week 1)
@@ -45,17 +53,30 @@ ecommerce-shopping-platform/
 ### Frontend
 - ✅ React with Vite setup
 - ✅ Redux state management
-- ✅ Login and Register pages
-- ✅ Material-UI components
+- ✅ Custom hooks for form handling
+- ✅ Reusable component architecture:
+  - Common components (AlertMessage, LoadingButton)
+  - Form components (FormTextField)
+  - Layout components (PageContainer)
+- ✅ Authentication pages (Login/Register)
+- ✅ Material-UI integration
 - ✅ API service configuration
 
-## API Endpoints
+## Component Architecture
 
-### Authentication
-- `POST /api/register` - Register new user
-- `POST /api/login` - User login
-- `POST /api/logout` - User logout (protected)
-- `GET /api/user` - Get current user data (protected)
+### Reusable Components
+1. **Layout Components**
+   - `PageContainer`: Wrapper for consistent page layout
+   
+2. **Common Components**
+   - `AlertMessage`: Handles error and success messages
+   - `LoadingButton`: Button with loading state
+   
+3. **Form Components**
+   - `FormTextField`: Standardized form input fields
+
+### Custom Hooks
+- `useForm`: Manages form state and handling
 
 ## Getting Started
 
@@ -145,15 +166,7 @@ ecommerce-shopping-platform/
   - React
   - Redux Toolkit
   - Material-UI
+  - Custom Hooks
+  - Reusable Components
   - Axios
   - React Router
-
-## Contributing
-1. Fork the repository
-2. Create your feature branch
-3. Commit your changes
-4. Push to the branch
-5. Create a new Pull Request
-
-## License
-This project is licensed under the MIT License. 
