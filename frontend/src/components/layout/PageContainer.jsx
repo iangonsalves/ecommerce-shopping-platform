@@ -2,20 +2,37 @@ import { Container, Box, Paper } from '@mui/material';
 
 const PageContainer = ({ children, maxWidth = 'xs' }) => {
   return (
-    <Container component="main" maxWidth={maxWidth}>
-      <Box
-        sx={{
-          marginTop: 8,
+    <Box
+      sx={{
+        display: 'flex',
+        flexGrow: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        minHeight: '100%',
+        width: '100%',
+      }}
+    >
+      <Container 
+        component="main" 
+        maxWidth={maxWidth} 
+        sx={{ 
           display: 'flex',
-          flexDirection: 'column',
+          justifyContent: 'center',
           alignItems: 'center',
         }}
       >
-        <Paper elevation={3} sx={{ p: 4, width: '100%' }}>
+        <Paper 
+          elevation={3} 
+          sx={{ 
+            p: 4, 
+            width: '100%',
+            maxWidth: maxWidth === 'xs' ? '400px' : 'none'
+          }}
+        >
           {children}
         </Paper>
-      </Box>
-    </Container>
+      </Container>
+    </Box>
   );
 };
 

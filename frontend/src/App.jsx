@@ -5,6 +5,7 @@ import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import { Box } from '@mui/material';
 
 // Create a theme instance
 const theme = createTheme({
@@ -16,6 +17,27 @@ const theme = createTheme({
       main: '#dc004e',
     },
   },
+  components: {
+    MuiCssBaseline: {
+      styleOverrides: {
+        body: {
+          margin: 0,
+          padding: 0,
+          height: '100vh',
+          display: 'flex',
+          flexDirection: 'column',
+        },
+        html: {
+          height: '100%',
+        },
+        '#root': {
+          height: '100vh',
+          display: 'flex',
+          flexDirection: 'column',
+        },
+      },
+    },
+  },
 });
 
 function App() {
@@ -24,12 +46,14 @@ function App() {
       <ThemeProvider theme={theme}>
         <CssBaseline />
         <Router>
-          <Routes>
-            {/* Add your routes here */}
-            <Route path="/" element={<div>Home Page</div>} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-          </Routes>
+          <Box sx={{ height: '100vh', display: 'flex', flexDirection: 'column' }}>
+            <Routes>
+              {/* Add your routes here */}
+              <Route path="/" element={<div>Home Page</div>} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
+            </Routes>
+          </Box>
         </Router>
       </ThemeProvider>
     </Provider>
