@@ -6,6 +6,8 @@ import CssBaseline from '@mui/material/CssBaseline';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import { Box } from '@mui/material';
+import ProductList from './pages/ProductList';
+import ProductDetail from './pages/ProductDetail';
 
 // Create a theme instance
 const theme = createTheme({
@@ -48,10 +50,11 @@ function App() {
         <Router>
           <Box sx={{ height: '100vh', display: 'flex', flexDirection: 'column' }}>
             <Routes>
-              {/* Add your routes here */}
               <Route path="/" element={<div>Home Page</div>} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
+              <Route path="/products" element={<ProductList />} />
+              <Route path="/products/:id" element={<ProductDetail />} />
             </Routes>
           </Box>
         </Router>
