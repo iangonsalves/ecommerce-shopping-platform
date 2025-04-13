@@ -5,9 +5,11 @@ import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import Login from './pages/Login';
 import Register from './pages/Register';
-import { Box } from '@mui/material';
 import ProductList from './pages/ProductList';
 import ProductDetail from './pages/ProductDetail';
+import CategoryList from './pages/CategoryList';
+import CategoryDetail from './pages/CategoryDetail';
+import { Box } from '@mui/material';
 
 // Create a theme instance
 const theme = createTheme({
@@ -32,11 +34,6 @@ const theme = createTheme({
         html: {
           height: '100%',
         },
-        '#root': {
-          height: '100vh',
-          display: 'flex',
-          flexDirection: 'column',
-        },
       },
     },
   },
@@ -48,13 +45,14 @@ function App() {
       <ThemeProvider theme={theme}>
         <CssBaseline />
         <Router>
-          <Box sx={{ height: '100vh', display: 'flex', flexDirection: 'column' }}>
+          <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
             <Routes>
-              <Route path="/" element={<div>Home Page</div>} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
               <Route path="/products" element={<ProductList />} />
               <Route path="/products/:id" element={<ProductDetail />} />
+              <Route path="/categories" element={<CategoryList />} />
+              <Route path="/categories/:id" element={<CategoryDetail />} />
             </Routes>
           </Box>
         </Router>
