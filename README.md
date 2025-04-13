@@ -1,172 +1,94 @@
-# E-Commerce Shopping Platform
+# E-commerce Shopping Platform
 
-A modern e-commerce platform built with Laravel (backend) and React (frontend).
+A full-stack e-commerce platform built with React and Laravel.
+
+## Features
+
+- User authentication (login/register)
+- Product listing and details
+- Category management
+- Product search and filtering
+- Price sorting
+- Shopping cart (coming soon)
+- User profile management (coming soon)
+- Order management (coming soon)
+
+## Tech Stack
+
+- Frontend: React, Material-UI, Vite
+- Backend: Laravel, MySQL
+- Authentication: JWT
 
 ## Project Structure
 
 ```
 ecommerce-shopping-platform/
-├── backend/                 # Laravel backend
-│   ├── app/
-│   │   ├── Http/
-│   │   │   └── Controllers/
-│   │   │       └── AuthController.php
-│   │   └── Models/
-│   │       └── User.php
-│   ├── database/
-│   │   └── migrations/
-│   └── routes/
-│       └── api.php
-│
-└── frontend/               # React frontend
-    ├── src/
-    │   ├── components/    # Reusable components
-    │   │   ├── common/    # Common UI components
-    │   │   │   ├── AlertMessage.jsx
-    │   │   │   └── LoadingButton.jsx
-    │   │   ├── form/     # Form-specific components
-    │   │   │   └── FormTextField.jsx
-    │   │   └── layout/   # Layout components
-    │   │       └── PageContainer.jsx
-    │   ├── hooks/        # Custom React hooks
-    │   │   └── useForm.js
-    │   ├── features/     # Redux features/slices
-    │   │   └── auth/
-    │   │       └── authSlice.js
-    │   ├── pages/        # Page components
-    │   │   ├── Login.jsx
-    │   │   └── Register.jsx
-    │   ├── services/     # API services
-    │   │   └── api.js
-    │   └── App.jsx
+├── frontend/               # React frontend application
+├── backend/               # Laravel backend API
+└── README.md             # This file
 ```
-
-## Features Implemented (Week 1)
-
-### Backend
-- ✅ Laravel with Sanctum authentication
-- ✅ User registration and login system
-- ✅ Role-based access control (admin/customer)
-- ✅ API endpoints for authentication
-- ✅ Database migrations for users table
-
-### Frontend
-- ✅ React with Vite setup
-- ✅ Redux state management
-- ✅ Custom hooks for form handling
-- ✅ Reusable component architecture:
-  - Common components (AlertMessage, LoadingButton)
-  - Form components (FormTextField)
-  - Layout components (PageContainer)
-- ✅ Authentication pages (Login/Register)
-- ✅ Material-UI integration
-- ✅ API service configuration
-
-## Component Architecture
-
-### Reusable Components
-1. **Layout Components**
-   - `PageContainer`: Wrapper for consistent page layout
-   
-2. **Common Components**
-   - `AlertMessage`: Handles error and success messages
-   - `LoadingButton`: Button with loading state
-   
-3. **Form Components**
-   - `FormTextField`: Standardized form input fields
-
-### Custom Hooks
-- `useForm`: Manages form state and handling
 
 ## Getting Started
 
 ### Prerequisites
+
 - PHP >= 8.1
 - Composer
 - Node.js >= 16
-- npm
 - MySQL
 
-### Backend Setup
-1. Navigate to backend directory:
-   ```bash
-   cd backend
-   ```
+### Installation
 
-2. Install dependencies:
-   ```bash
-   composer install
-   ```
+1. Clone the repository:
+```bash
+git clone https://github.com/yourusername/ecommerce-shopping-platform.git
+cd ecommerce-shopping-platform
+```
 
-3. Copy .env.example to .env:
-   ```bash
-   cp .env.example .env
-   ```
+2. Set up the backend:
+```bash
+cd backend
+composer install
+cp .env.example .env
+php artisan key:generate
+php artisan migrate:fresh --seed
+php artisan serve
+```
 
-4. Generate application key:
-   ```bash
-   php artisan key:generate
-   ```
+3. Set up the frontend:
+```bash
+cd frontend
+npm install
+npm run dev
+```
 
-5. Configure database in .env:
-   ```
-   DB_CONNECTION=mysql
-   DB_HOST=127.0.0.1
-   DB_PORT=3306
-   DB_DATABASE=your_database
-   DB_USERNAME=your_username
-   DB_PASSWORD=your_password
-   ```
+## API Documentation
 
-6. Run migrations:
-   ```bash
-   php artisan migrate
-   ```
+### Authentication Endpoints
 
-7. Start the server:
-   ```bash
-   php artisan serve
-   ```
+- POST /api/auth/register - Register a new user
+- POST /api/auth/login - Login user
+- POST /api/auth/logout - Logout user
+- GET /api/auth/user - Get authenticated user
 
-### Frontend Setup
-1. Navigate to frontend directory:
-   ```bash
-   cd frontend
-   ```
+### Product Endpoints
 
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
+- GET /api/products - List all products
+- GET /api/products/{id} - Get product details
+- GET /api/products?search={term} - Search products
+- GET /api/products?category={id} - Filter by category
+- GET /api/products?sort=price_asc - Sort by price
 
-3. Start the development server:
-   ```bash
-   npm run dev
-   ```
+### Category Endpoints
 
-## Testing
-1. Backend server runs on: http://127.0.0.1:8000
-2. Frontend server runs on: http://localhost:5173
+- GET /api/categories - List all categories
+- GET /api/categories/{id} - Get category details
+- GET /api/categories/{id}/products - Get products in category
 
-## Next Steps (Week 2)
-- Product catalog implementation
-- Product listing page
-- Product detail page
-- Category management
-- Search functionality
+## Contributing
 
-## Technologies Used
-- Backend:
-  - Laravel
-  - Laravel Sanctum
-  - MySQL
-  - PHP 8.1+
-
-- Frontend:
-  - React
-  - Redux Toolkit
-  - Material-UI
-  - Custom Hooks
-  - Reusable Components
-  - Axios
-  - React Router
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request

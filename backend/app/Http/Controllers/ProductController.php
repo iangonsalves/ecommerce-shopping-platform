@@ -10,9 +10,34 @@ class ProductController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        return response()->json(Product::all());
+        $query = Product::query();
+        
+        // Search by name or description
+        if ($request->has('search')) {
+            $searchTerm = $request->search;
+            $query->where(function($q) use ($searchTerm) {
+                $q->where('name', 'like', "%{$searchTerm}%")
+                  ->orWhere('description', 'like', "%{$searchTerm}%");
+            });
+        }
+        
+        // Filter by category
+        if ($request->has('category_id')) {
+            $query->where('category_id', $request->category_id);
+        }
+        
+        // Sort by price
+        if ($request->has('sort')) {
+            $sortField = 'price';
+            $sortDirection = $request->sort === 'asc' ? 'asc' : 'desc';
+            $query->orderBy($sortField, $sortDirection);
+        } else {
+            $query->orderBy('created_at', 'desc');
+        }
+        
+        return response()->json($query->with('category')->get());
     }
 
     /**
@@ -26,6 +51,7 @@ class ProductController extends Controller
             'price' => 'required|numeric|min:0',
             'stock' => 'required|integer|min:0',
             'image' => 'nullable|string',
+            'category_id' => 'nullable|exists:categories,id',
         ]);
 
         $product = Product::create($validated);
@@ -37,7 +63,7 @@ class ProductController extends Controller
      */
     public function show(Product $product)
     {
-        return response()->json($product);
+        return response()->json($product->load('category'));
     }
 
     /**
@@ -51,6 +77,7 @@ class ProductController extends Controller
             'price' => 'numeric|min:0',
             'stock' => 'integer|min:0',
             'image' => 'nullable|string',
+            'category_id' => 'nullable|exists:categories,id',
         ]);
 
         $product->update($validated);
