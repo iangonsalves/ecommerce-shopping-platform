@@ -1,113 +1,124 @@
-import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate, Link } from 'react-router-dom';
-import { register, clearError, clearMessage } from '../features/auth/authSlice';
-import { Typography, Box } from '@mui/material';
-import PageContainer from '../components/layout/PageContainer';
-import AlertMessage from '../components/common/AlertMessage';
-import FormTextField from '../components/form/FormTextField';
-import LoadingButton from '../components/common/LoadingButton';
-import useForm from '../hooks/useForm';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import {
+  Container,
+  Paper,
+  Typography,
+  TextField,
+  Button,
+  Box,
+  Alert
+} from '@mui/material';
+import { useAuth } from '../context/AuthContext';
 
 const Register = () => {
-  const {
-    formData,
-    handleChange,
-    resetForm
-  } = useForm({
+  const navigate = useNavigate();
+  const { register, error: authError } = useAuth();
+  const [formData, setFormData] = useState({
     name: '',
     email: '',
     password: '',
-    password_confirmation: '',
+    password_confirmation: ''
   });
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
-  const { loading, error, message } = useSelector((state) => state.auth);
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    });
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const result = await dispatch(register(formData));
-    if (!result.error) {
-      resetForm();
-      setTimeout(() => {
-        navigate('/');
-      }, 1500);
+    setError('');
+    setLoading(true);
+
+    try {
+      await register(
+        formData.name,
+        formData.email,
+        formData.password,
+        formData.password_confirmation
+      );
+      navigate('/profile');
+    } catch (err) {
+      setError(err.message || 'Registration failed');
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <PageContainer>
-      <Typography component="h1" variant="h5" align="center" gutterBottom>
-        Register
-      </Typography>
-      
-      <AlertMessage 
-        message={error} 
-        severity="error" 
-        onClose={() => dispatch(clearError())} 
-      />
-      
-      <AlertMessage 
-        message={message} 
-        severity="success" 
-        onClose={() => dispatch(clearMessage())} 
-      />
+    <Container maxWidth="sm">
+      <Box sx={{ mt: 8, mb: 4 }}>
+        <Paper elevation={3} sx={{ p: 4 }}>
+          <Typography variant="h4" component="h1" gutterBottom align="center">
+            Register
+          </Typography>
 
-      <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1 }}>
-        <FormTextField
-          name="name"
-          label="Full Name"
-          autoComplete="name"
-          autoFocus
-          value={formData.name}
-          onChange={handleChange}
-        />
-        
-        <FormTextField
-          name="email"
-          label="Email Address"
-          autoComplete="email"
-          value={formData.email}
-          onChange={handleChange}
-        />
-        
-        <FormTextField
-          name="password"
-          label="Password"
-          type="password"
-          autoComplete="new-password"
-          value={formData.password}
-          onChange={handleChange}
-        />
-        
-        <FormTextField
-          name="password_confirmation"
-          label="Confirm Password"
-          type="password"
-          autoComplete="new-password"
-          value={formData.password_confirmation}
-          onChange={handleChange}
-        />
+          {(error || authError) && (
+            <Alert severity="error" sx={{ mb: 2 }}>
+              {error || authError}
+            </Alert>
+          )}
 
-        <LoadingButton
-          type="submit"
-          fullWidth
-          variant="contained"
-          sx={{ mt: 3, mb: 2 }}
-          loading={loading}
-          loadingText="Registering..."
-        >
-          Register
-        </LoadingButton>
-
-        <Typography variant="body2" align="center" sx={{ mt: 2 }}>
-          Already have an account?{' '}
-          <Link to="/login" style={{ textDecoration: 'none' }}>
-            Login here
-          </Link>
-        </Typography>
+          <form onSubmit={handleSubmit}>
+            <TextField
+              fullWidth
+              label="Name"
+              name="name"
+              value={formData.name}
+              onChange={handleChange}
+              margin="normal"
+              required
+            />
+            <TextField
+              fullWidth
+              label="Email"
+              name="email"
+              type="email"
+              value={formData.email}
+              onChange={handleChange}
+              margin="normal"
+              required
+            />
+            <TextField
+              fullWidth
+              label="Password"
+              name="password"
+              type="password"
+              value={formData.password}
+              onChange={handleChange}
+              margin="normal"
+              required
+            />
+            <TextField
+              fullWidth
+              label="Confirm Password"
+              name="password_confirmation"
+              type="password"
+              value={formData.password_confirmation}
+              onChange={handleChange}
+              margin="normal"
+              required
+            />
+            <Button
+              type="submit"
+              fullWidth
+              variant="contained"
+              color="primary"
+              size="large"
+              disabled={loading}
+              sx={{ mt: 3 }}
+            >
+              {loading ? 'Registering...' : 'Register'}
+            </Button>
+          </form>
+        </Paper>
       </Box>
-    </PageContainer>
+    </Container>
   );
 };
 

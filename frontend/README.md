@@ -1,36 +1,56 @@
 # E-commerce Platform Frontend
 
-React-based frontend for the e-commerce platform.
+React-based frontend for the e-commerce platform, built with Material-UI.
 
 ## Features
 
+### Core Features
 - User authentication (login/register)
-- Product listing with search and filtering
+- Product browsing and search
 - Category navigation
-- Responsive design with Material-UI
-- Form validation
-- Error handling
+- Shopping cart management
+- Responsive design
 
-## Components
+### Components
+- **Layout**: Navbar, Footer, PageContainer
+- **Products**: ProductList, ProductDetail, SearchBar
+- **Cart**: CartIcon, Cart, CartItem
+- **Auth**: Login, Register, ProtectedRoute
 
-### Layout Components
-- PageContainer - Main layout wrapper
-- Navbar - Navigation bar
+### State Management
+- AuthContext for user authentication
+- CartContext for shopping cart
+- Real-time cart updates
 
-### Common Components
-- AlertMessage - Error and success messages
-- LoadingButton - Button with loading state
-- SearchBar - Product search and filtering
+## Project Structure
 
-### Form Components
-- FormTextField - Standardized form input
+```
+src/
+├── components/
+│   ├── common/
+│   │   ├── CartIcon.jsx
+│   │   └── SearchBar.jsx
+│   └── layout/
+│       ├── Navbar.jsx
+│       └── Footer.jsx
+├── context/
+│   ├── AuthContext.jsx
+│   └── CartContext.jsx
+├── pages/
+│   ├── Cart.jsx
+│   ├── ProductList.jsx
+│   ├── ProductDetail.jsx
+│   ├── Login.jsx
+│   └── Register.jsx
+└── App.jsx
+```
 
-### Pages
-- Login - User login
-- Register - User registration
-- ProductList - Product listing with search
-- ProductDetail - Product details
-- CategoryList - Category listing
+## Main Dependencies
+
+- React 18
+- Material-UI
+- React Router
+- Axios
 
 ## Setup
 
@@ -44,34 +64,30 @@ npm install
 npm run dev
 ```
 
-3. Build for production:
-```bash
-npm run build
-```
+## Available Scripts
 
-## Project Structure
+- `npm run dev` - Development server
+- `npm run build` - Production build
+- `npm run preview` - Preview build
 
-```
-frontend/
-├── src/
-│   ├── components/     # Reusable components
-│   │   ├── common/    # Common UI components
-│   │   ├── form/      # Form components
-│   │   └── layout/    # Layout components
-│   ├── pages/         # Page components
-│   ├── services/      # API services
-│   ├── hooks/         # Custom React hooks
-│   └── App.jsx        # Main application component
-```
+## Key Features Implementation
 
-## Dependencies
+### Authentication
+- JWT-based auth flow
+- Protected routes
+- Persistent sessions
 
-- React 18
-- Material-UI
-- React Router
-- Axios
-- Vite
+### Shopping Cart
+- Real-time updates
+- Quantity management
+- Price calculations
 
-## Development
+### Product Display
+- Grid layout
+- Search functionality
+- Category filtering
 
-The development server will run at http://localhost:5173
+### Styling
+- Material-UI components
+- Responsive design
+- Custom theme

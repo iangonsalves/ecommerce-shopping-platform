@@ -1,33 +1,43 @@
-import { useDispatch, useSelector } from 'react-redux';
+import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { login, clearError, clearMessage } from '../features/auth/authSlice';
-import { Typography, Box } from '@mui/material';
+import { Typography, Box, Alert, CircularProgress } from '@mui/material';
+import { useAuth } from '../context/AuthContext';
 import PageContainer from '../components/layout/PageContainer';
-import AlertMessage from '../components/common/AlertMessage';
 import FormTextField from '../components/form/FormTextField';
 import LoadingButton from '../components/common/LoadingButton';
-import useForm from '../hooks/useForm';
 
 const Login = () => {
-  const {
-    formData,
-    handleChange,
-    resetForm
-  } = useForm({
+  const [formData, setFormData] = useState({
     email: '',
     password: '',
   });
-
-  const dispatch = useDispatch();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const { login } = useAuth();
   const navigate = useNavigate();
-  const { loading, error, message } = useSelector((state) => state.auth);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+    // Clear error when user starts typing
+    if (error) setError('');
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const result = await dispatch(login(formData));
-    if (!result.error) {
-      resetForm();
+    setLoading(true);
+    setError('');
+
+    try {
+      await login(formData.email, formData.password);
       navigate('/');
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to login');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -37,17 +47,11 @@ const Login = () => {
         Login
       </Typography>
       
-      <AlertMessage 
-        message={error} 
-        severity="error" 
-        onClose={() => dispatch(clearError())} 
-      />
-      
-      <AlertMessage 
-        message={message} 
-        severity="success" 
-        onClose={() => dispatch(clearMessage())} 
-      />
+      {error && (
+        <Alert severity="error" sx={{ mb: 2 }} onClose={() => setError('')}>
+          {error}
+        </Alert>
+      )}
 
       <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1 }}>
         <FormTextField
@@ -57,6 +61,7 @@ const Login = () => {
           autoFocus
           value={formData.email}
           onChange={handleChange}
+          required
         />
         
         <FormTextField
@@ -66,6 +71,7 @@ const Login = () => {
           autoComplete="current-password"
           value={formData.password}
           onChange={handleChange}
+          required
         />
 
         <LoadingButton
