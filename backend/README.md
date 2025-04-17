@@ -1,104 +1,187 @@
 # E-commerce Platform Backend
 
-Laravel-based REST API for the e-commerce platform.
+Laravel-based RESTful API backend for the e-commerce platform.
 
 ## Features
 
-- User authentication with JWT
-- Product management
-- Category management
-- Search and filtering
-- Database seeding
-
-## API Endpoints
-
 ### Authentication
-- POST /api/auth/register - Register new user
-- POST /api/auth/login - User login
-- POST /api/auth/logout - User logout
-- GET /api/auth/user - Get authenticated user
+- JWT-based authentication
+- User registration and login
+- Token refresh mechanism
+- Protected routes
 
 ### Products
-- GET /api/products - List all products
-- GET /api/products/{id} - Get product details
-- GET /api/products?search={term} - Search products
-- GET /api/products?category={id} - Filter by category
-- GET /api/products?sort=price_asc - Sort by price
+- Product CRUD operations
+- Product categorization
+- Product search and filtering
+- Image handling
+
+### Shopping Cart
+- Cart management system
+- Real-time quantity updates
+- Price calculations
+- Cart item validation
 
 ### Categories
-- GET /api/categories - List all categories
-- GET /api/categories/{id} - Get category details
-- GET /api/categories/{id}/products - Get products in category
+- Category management
+- Product-category relationships
+- Nested category support
+
+## Project Structure
+
+```
+app/
+├── Http/
+│   ├── Controllers/
+│   │   ├── AuthController.php
+│   │   ├── ProductController.php
+│   │   ├── CategoryController.php
+│   │   └── CartController.php
+│   ├── Middleware/
+│   │   └── JwtMiddleware.php
+│   └── Requests/
+├── Models/
+│   ├── User.php
+│   ├── Product.php
+│   ├── Category.php
+│   ├── Cart.php
+│   └── CartItem.php
+└── Services/
+    └── CartService.php
+```
 
 ## Database Structure
 
-### Users Table
-- id (primary key)
+### Users
+- id
 - name
-- email (unique)
+- email
 - password
-- role (admin/customer)
 - timestamps
 
-### Products Table
-- id (primary key)
+### Products
+- id
 - name
 - description
 - price
 - image
-- category_id (foreign key)
+- category_id
 - timestamps
 
-### Categories Table
-- id (primary key)
+### Categories
+- id
 - name
 - description
 - timestamps
 
-## Setup
+### Carts
+- id
+- user_id
+- total
+- timestamps
+
+### Cart Items
+- id
+- cart_id
+- product_id
+- quantity
+- price
+- timestamps
+
+## API Endpoints
+
+### Authentication
+```
+POST   /api/register     - Register new user
+POST   /api/login        - User login
+POST   /api/logout       - User logout
+GET    /api/user         - Get authenticated user
+```
+
+### Products
+```
+GET    /api/products           - List all products
+GET    /api/products/{id}      - Get product details
+GET    /api/products/search    - Search products
+POST   /api/products           - Create product (admin)
+PUT    /api/products/{id}      - Update product (admin)
+DELETE /api/products/{id}      - Delete product (admin)
+```
+
+### Categories
+```
+GET    /api/categories         - List all categories
+GET    /api/categories/{id}    - Get category details
+POST   /api/categories         - Create category (admin)
+PUT    /api/categories/{id}    - Update category (admin)
+DELETE /api/categories/{id}    - Delete category (admin)
+```
+
+### Cart
+```
+GET    /api/cart              - Get user's cart
+POST   /api/cart/items        - Add item to cart
+PUT    /api/cart/items/{id}   - Update cart item quantity
+DELETE /api/cart/items/{id}   - Remove item from cart
+```
+
+## Development Setup
 
 1. Install dependencies:
 ```bash
 composer install
 ```
 
-2. Copy environment file:
+2. Configure environment:
 ```bash
 cp .env.example .env
-```
-
-3. Generate application key:
-```bash
 php artisan key:generate
 ```
 
-4. Configure database in .env:
+3. Configure database in .env:
 ```
 DB_CONNECTION=mysql
 DB_HOST=127.0.0.1
 DB_PORT=3306
-DB_DATABASE=your_database
-DB_USERNAME=your_username
-DB_PASSWORD=your_password
+DB_DATABASE=ecommerce
+DB_USERNAME=root
+DB_PASSWORD=
 ```
 
-5. Run migrations and seeders:
+4. Run migrations and seeders:
 ```bash
 php artisan migrate:fresh --seed
 ```
 
-6. Start the server:
+5. Start development server:
 ```bash
 php artisan serve
 ```
 
-## Testing
+## Authentication
 
-The API will be available at http://localhost:8000
+The API uses JWT (JSON Web Tokens) for authentication:
+```
+Authorization: Bearer <token>
+```
 
-## Dependencies
+## Error Handling
 
-- PHP >= 8.1
-- Laravel 10.x
-- MySQL
-- JWT Authentication
+HTTP Status Codes:
+- 200: Success
+- 201: Created
+- 400: Bad Request
+- 401: Unauthorized
+- 403: Forbidden
+- 404: Not Found
+- 422: Validation Error
+- 500: Server Error
+
+## Security
+
+- JWT authentication required for protected routes
+- Input validation on all endpoints
+- CORS configuration
+- Rate limiting on authentication endpoints
+- SQL injection protection
+- XSS protection

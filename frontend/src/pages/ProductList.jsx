@@ -1,87 +1,117 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
-import { Container, Grid, Card, CardContent, Typography, CardMedia, CardActionArea } from '@mui/material';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import SearchBar from '../components/common/SearchBar';
+import {
+  Container,
+  Grid,
+  Card,
+  CardContent,
+  CardMedia,
+  Typography,
+  Button,
+  Box,
+  CircularProgress,
+  Alert
+} from '@mui/material';
+import axios from 'axios';
+import { useCart } from '../context/CartContext';
 
 const ProductList = () => {
   const [products, setProducts] = useState([]);
-  const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const { addToCart, loading: cartLoading, error: cartError, refreshCart } = useCart();
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchProducts = async () => {
       try {
-        const [productsResponse, categoriesResponse] = await Promise.all([
-          axios.get('http://localhost:8000/api/products'),
-          axios.get('http://localhost:8000/api/categories')
-        ]);
-        
-        setProducts(productsResponse.data);
-        setCategories(categoriesResponse.data);
-        setLoading(false);
+        const response = await axios.get('/api/products');
+        setProducts(response.data);
       } catch (error) {
-        console.error('Error fetching data:', error);
+        setError('Error fetching products');
+        console.error('Error:', error);
+      } finally {
         setLoading(false);
       }
     };
 
-    fetchData();
+    fetchProducts();
   }, []);
 
-  const handleSearch = async (params) => {
-    try {
-      setLoading(true);
-      const queryString = new URLSearchParams(params).toString();
-      const response = await axios.get(`http://localhost:8000/api/products?${queryString}`);
-      setProducts(response.data);
-      setLoading(false);
-    } catch (error) {
-      console.error('Error searching products:', error);
-      setLoading(false);
+  const handleAddToCart = async (productId) => {
+    const success = await addToCart(productId, 1);
+    if (success) {
+      refreshCart();
     }
   };
 
   if (loading) {
-    return <Typography>Loading...</Typography>;
+    return (
+      <Container>
+        <Box display="flex" justifyContent="center" alignItems="center" minHeight="60vh">
+          <CircularProgress />
+        </Box>
+      </Container>
+    );
+  }
+
+  if (error) {
+    return (
+      <Container>
+        <Alert severity="error" sx={{ mt: 2 }}>
+          {error}
+        </Alert>
+      </Container>
+    );
   }
 
   return (
-    <Container>
-      <Typography variant="h4" component="h1" gutterBottom>
-        Products
-      </Typography>
-      
-      <SearchBar onSearch={handleSearch} categories={categories} />
-      
-      <Grid container spacing={3}>
+    <Container maxWidth="lg" sx={{ mt: 4 }}>
+      {cartError && (
+        <Alert severity="error" sx={{ mb: 2 }}>
+          {cartError}
+        </Alert>
+      )}
+
+      <Grid container spacing={4}>
         {products.map((product) => (
-          <Grid item xs={12} sm={6} md={4} key={product.id}>
-            <Card>
-              <CardActionArea component={Link} to={`/products/${product.id}`}>
-                <CardMedia
-                  component="img"
-                  height="140"
-                  image={product.image || 'https://via.placeholder.com/140'}
-                  alt={product.name}
-                />
-                <CardContent>
-                  <Typography gutterBottom variant="h5" component="div">
-                    {product.name}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    {product.description}
-                  </Typography>
-                  <Typography variant="h6" color="primary">
-                    ${product.price}
-                  </Typography>
-                  {product.category && (
-                    <Typography variant="body2" color="text.secondary">
-                      Category: {product.category.name}
-                    </Typography>
-                  )}
-                </CardContent>
-              </CardActionArea>
+          <Grid item key={product.id} xs={12} sm={6} md={4}>
+            <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+              <CardMedia
+                component="img"
+                height="200"
+                image={product.image || product.image_url || 'https://via.placeholder.com/200'}
+                alt={product.name}
+                sx={{ objectFit: 'contain', p: 2 }}
+              />
+              <CardContent sx={{ flexGrow: 1 }}>
+                <Typography gutterBottom variant="h5" component="h2">
+                  {product.name}
+                </Typography>
+                <Typography variant="h6" color="primary" gutterBottom>
+                  ${product.price.toFixed(2)}
+                </Typography>
+                <Typography variant="body2" color="text.secondary" paragraph>
+                  {product.description}
+                </Typography>
+                <Box sx={{ mt: 'auto', display: 'flex', gap: 1 }}>
+                  <Button
+                    component={Link}
+                    to={`/products/${product.id}`}
+                    variant="outlined"
+                    fullWidth
+                  >
+                    View Details
+                  </Button>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={() => handleAddToCart(product.id)}
+                    disabled={cartLoading}
+                  >
+                    {cartLoading ? 'Adding...' : 'Add to Cart'}
+                  </Button>
+                </Box>
+              </CardContent>
             </Card>
           </Grid>
         ))}

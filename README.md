@@ -1,94 +1,127 @@
 # E-commerce Shopping Platform
 
-A full-stack e-commerce platform built with React and Laravel.
+A modern, full-stack e-commerce platform built with Laravel (Backend) and React (Frontend).
 
 ## Features
 
-- User authentication (login/register)
-- Product listing and details
-- Category management
+### Authentication & User Management
+- User registration and login
+- JWT-based authentication
+- Protected routes
+- User profile management
+
+### Product Management
+- Product listing with details
+- Product categories
 - Product search and filtering
-- Price sorting
-- Shopping cart (coming soon)
-- User profile management (coming soon)
-- Order management (coming soon)
+- Detailed product views
 
-## Tech Stack
+### Shopping Cart
+- Real-time cart management
+- Add/remove items
+- Update quantities
+- Persistent cart across sessions
 
-- Frontend: React, Material-UI, Vite
-- Backend: Laravel, MySQL
-- Authentication: JWT
+### Categories
+- Browse products by category
+- Category listing page
+- Category detail view
+
+## Technical Stack
+
+### Frontend
+- React 18
+- Material-UI (MUI)
+- React Router
+- Axios
+
+### Backend
+- Laravel 10
+- MySQL database
+- JWT authentication
+- RESTful API
 
 ## Project Structure
 
 ```
-ecommerce-shopping-platform/
-├── frontend/               # React frontend application
-├── backend/               # Laravel backend API
-└── README.md             # This file
+├── backend/                 # Laravel API backend
+└── frontend/               # React frontend
 ```
+
+See individual README files in each directory for detailed documentation.
 
 ## Getting Started
 
 ### Prerequisites
-
-- PHP >= 8.1
-- Composer
-- Node.js >= 16
+- PHP 8.1 or higher
+- Node.js 16 or higher
 - MySQL
+- Composer
+- npm
 
-### Installation
-
-1. Clone the repository:
-```bash
-git clone https://github.com/yourusername/ecommerce-shopping-platform.git
-cd ecommerce-shopping-platform
-```
-
-2. Set up the backend:
+### Backend Setup
+1. Navigate to the backend directory:
 ```bash
 cd backend
+```
+
+2. Install PHP dependencies:
+```bash
 composer install
+```
+
+3. Configure environment:
+```bash
 cp .env.example .env
 php artisan key:generate
+```
+
+4. Run migrations and seeders:
+```bash
 php artisan migrate:fresh --seed
+```
+
+5. Start the Laravel server:
+```bash
 php artisan serve
 ```
 
-3. Set up the frontend:
+### Frontend Setup
+1. Navigate to the frontend directory:
 ```bash
 cd frontend
+```
+
+2. Install Node dependencies:
+```bash
 npm install
+```
+
+3. Start the development server:
+```bash
 npm run dev
 ```
 
-## API Documentation
+## API Endpoints
 
-### Authentication Endpoints
+### Authentication
+- POST `/api/register` - User registration
+- POST `/api/login` - User login
+- POST `/api/logout` - User logout
+- GET `/api/user` - Get authenticated user
 
-- POST /api/auth/register - Register a new user
-- POST /api/auth/login - Login user
-- POST /api/auth/logout - Logout user
-- GET /api/auth/user - Get authenticated user
+### Products
+- GET `/api/products` - List all products
+- GET `/api/products/{id}` - Get product details
+- GET `/api/products/search` - Search products
 
-### Product Endpoints
+### Categories
+- GET `/api/categories` - List all categories
+- GET `/api/categories/{id}` - Get category details
 
-- GET /api/products - List all products
-- GET /api/products/{id} - Get product details
-- GET /api/products?search={term} - Search products
-- GET /api/products?category={id} - Filter by category
-- GET /api/products?sort=price_asc - Sort by price
+### Cart
+- GET `/api/cart` - Get user's cart
+- POST `/api/cart/items` - Add item to cart
+- PUT `/api/cart/items/{id}` - Update cart item quantity
+- DELETE `/api/cart/items/{id}` - Remove item from cart
 
-### Category Endpoints
-
-- GET /api/categories - List all categories
-- GET /api/categories/{id} - Get category details
-- GET /api/categories/{id}/products - Get products in category
-
-## Contributing
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
