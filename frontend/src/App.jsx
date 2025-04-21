@@ -16,6 +16,8 @@ import ProductList from './pages/ProductList';
 import ProductDetail from './pages/ProductDetail';
 import Cart from './pages/Cart';
 import Checkout from './pages/Checkout';
+import OrderSuccess from './pages/OrderSuccess';
+import OrderHistory from './pages/OrderHistory';
 import Profile from './pages/Profile';
 import CategoryList from './pages/CategoryList';
 import CategoryDetail from './pages/CategoryDetail';
@@ -48,6 +50,8 @@ function App() {
                   <Route path="/categories/:id" element={<CategoryDetail />} />
                   <Route path="/cart" element={<PrivateRoute><Cart /></PrivateRoute>} />
                   <Route path="/checkout" element={<PrivateRoute><Checkout /></PrivateRoute>} />
+                  <Route path="/checkout/success" element={<PrivateRoute><OrderSuccess /></PrivateRoute>} />
+                  <Route path="/orders" element={<PrivateRoute><OrderHistory /></PrivateRoute>} />
                   <Route path="/profile" element={<PrivateRoute><Profile /></PrivateRoute>} />
                   <Route path="*" element={<NotFound />} />
                 </Routes>

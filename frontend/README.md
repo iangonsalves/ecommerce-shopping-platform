@@ -9,12 +9,14 @@ React-based frontend for the e-commerce platform, built with Material-UI.
 - Product browsing and search
 - Category navigation
 - Shopping cart management
+- Order history tracking
 - Responsive design
 
 ### Components
 - **Layout**: Navbar, Footer, PageContainer
 - **Products**: ProductList, ProductDetail, SearchBar
 - **Cart**: CartIcon, Cart, CartItem
+- **Orders**: OrderHistory, OrderSuccess
 - **Auth**: Login, Register, ProtectedRoute
 
 ### State Management
@@ -41,7 +43,9 @@ src/
 │   ├── ProductList.jsx
 │   ├── ProductDetail.jsx
 │   ├── Login.jsx
-│   └── Register.jsx
+│   ├── Register.jsx
+│   ├── OrderHistory.jsx
+│   └── OrderSuccess.jsx
 └── App.jsx
 ```
 

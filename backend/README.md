@@ -22,6 +22,12 @@ Laravel-based RESTful API backend for the e-commerce platform.
 - Price calculations
 - Cart item validation
 
+### Orders
+- Order placement and processing
+- Order history tracking
+- Order status management
+- Shipping information handling
+
 ### Categories
 - Category management
 - Product-category relationships
@@ -36,7 +42,9 @@ app/
 │   │   ├── AuthController.php
 │   │   ├── ProductController.php
 │   │   ├── CategoryController.php
-│   │   └── CartController.php
+│   │   ├── CartController.php
+│   │   ├── OrderController.php
+│   │   └── CheckoutController.php
 │   ├── Middleware/
 │   │   └── JwtMiddleware.php
 │   └── Requests/
@@ -45,7 +53,9 @@ app/
 │   ├── Product.php
 │   ├── Category.php
 │   ├── Cart.php
-│   └── CartItem.php
+│   ├── CartItem.php
+│   ├── Order.php
+│   └── OrderItem.php
 └── Services/
     └── CartService.php
 ```
@@ -88,6 +98,24 @@ app/
 - price
 - timestamps
 
+### Orders
+- id
+- user_id
+- total
+- status
+- shipping information
+- payment status
+- timestamps
+
+### Order Items
+- id
+- order_id
+- product_id
+- product_name
+- quantity
+- price
+- timestamps
+
 ## API Endpoints
 
 ### Authentication
@@ -123,6 +151,13 @@ GET    /api/cart              - Get user's cart
 POST   /api/cart/items        - Add item to cart
 PUT    /api/cart/items/{id}   - Update cart item quantity
 DELETE /api/cart/items/{id}   - Remove item from cart
+```
+
+### Orders
+```
+GET    /api/orders       - Get user's order history
+GET    /api/orders/{id}  - Get specific order details
+POST   /api/checkout     - Place new order
 ```
 
 ## Development Setup

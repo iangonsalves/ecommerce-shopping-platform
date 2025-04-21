@@ -22,6 +22,12 @@ A modern, full-stack e-commerce platform built with Laravel (Backend) and React 
 - Update quantities
 - Persistent cart across sessions
 
+### Order Management
+- Order placement and checkout
+- Order history tracking
+- Order status updates
+- Detailed order views
+
 ### Categories
 - Browse products by category
 - Category listing page
