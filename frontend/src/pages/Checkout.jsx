@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Container,
   Typography,
@@ -17,8 +17,12 @@ import {
 import { useCart } from '../context/CartContext';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { loadStripe } from '@stripe/stripe-js';
+import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
 
 const steps = ['Shipping Address', 'Payment Details', 'Review Order'];
+
+const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || 'YOUR_STRIPE_PUBLISHABLE_KEY');
 
 const initialShippingData = {
   firstName: '',
@@ -43,14 +47,120 @@ const initialErrors = {
   phone: ''
 };
 
-const Checkout = () => {
+const PaymentForm = ({ cart, shippingData, clientSecret, onSubmit, processing, error }) => {
+  const stripe = useStripe();
+  const elements = useElements();
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    onSubmit(null, null, true);
+
+    if (!stripe || !elements || !clientSecret) {
+      console.error('Stripe.js not loaded or no client secret');
+      onSubmit('Payment system not ready. Please wait or refresh.', null, false);
+      return;
+    }
+    
+    console.log('Using Client Secret:', clientSecret);
+
+    const cardElement = elements.getElement(CardElement);
+    if (!cardElement) {
+        onSubmit('Card details not found. Please try again.', null, false);
+        return;
+    }
+
+    const { error: paymentError, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
+      payment_method: {
+        card: cardElement,
+        billing_details: {
+          name: `${shippingData.firstName} ${shippingData.lastName}`,
+          address: {
+            line1: shippingData.address1 || '',
+            line2: shippingData.address2 || null,
+            city: shippingData.city || '',
+            state: shippingData.state || '',
+            postal_code: shippingData.zip || '',
+            country: shippingData.country || '',
+          },
+          phone: shippingData.phone || null,
+        },
+      },
+    });
+
+    if (paymentError) {
+      console.error("Stripe payment error object:", paymentError);
+      const message = paymentError.message || 'An unknown payment error occurred.';
+      onSubmit(message, null, false);
+    } else {
+      onSubmit(null, paymentIntent, false);
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <Typography variant="h6" gutterBottom>
+        Payment method
+      </Typography>
+      <Box sx={{ border: '1px solid #ccc', p: 2, borderRadius: 1, mb: 2 }}>
+        <CardElement options={{ style: { base: { fontSize: '16px' } }, disabled: processing || !clientSecret }} />
+      </Box>
+      {!clientSecret && !processing && (
+        <Alert severity="warning" sx={{ mb: 2 }}>Initializing payment form...</Alert>
+      )}
+      {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
+      <Button
+        type="submit"
+        variant="contained"
+        disabled={!stripe || !elements || !clientSecret || processing}
+        fullWidth
+      >
+        {processing ? <CircularProgress size={24} /> : `Pay $${cart?.total?.toFixed(2) || '0.00'}`}
+      </Button>
+    </form>
+  );
+};
+
+const CheckoutContent = () => {
   const [activeStep, setActiveStep] = useState(0);
   const [shippingData, setShippingData] = useState(initialShippingData);
   const [errors, setErrors] = useState(initialErrors);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState('');
-  const { cart, loading: cartLoading } = useCart();
+  const { cart, loading: cartLoading, clearCart } = useCart();
   const navigate = useNavigate();
+  const [clientSecret, setClientSecret] = useState('');
+  const [paymentProcessing, setPaymentProcessing] = useState(false);
+  const [paymentError, setPaymentError] = useState('');
+  const [paymentIntentId, setPaymentIntentId] = useState(null);
+
+  useEffect(() => {
+    const fetchPaymentIntent = async () => {
+        if (activeStep === 1 && cart?.items?.length > 0 && !clientSecret && !paymentProcessing) {
+            setPaymentProcessing(true);
+            setPaymentError('');
+            try {
+                const response = await axios.post('/api/create-payment-intent'); 
+                if (response.data.clientSecret) {
+                    setClientSecret(response.data.clientSecret);
+                } else {
+                    setPaymentError('Could not initialize payment. Please try again.');
+                }
+            } catch (error) {
+                console.error("Error fetching payment intent:", error);
+                setPaymentError(error.response?.data?.error || 'Failed to initialize payment system. Please refresh or try again later.');
+            } finally {
+                setPaymentProcessing(false);
+            }
+        }
+    };
+
+    fetchPaymentIntent();
+    
+    if (activeStep !== 1 && clientSecret) {
+      setClientSecret('');
+    }
+
+  }, [activeStep, cart?.items, clientSecret, paymentProcessing]); 
 
   const validateShippingForm = () => {
     const newErrors = { ...initialErrors };
@@ -106,40 +216,70 @@ const Checkout = () => {
     return isValid;
   };
 
-  const handleNext = async () => {
-    if (activeStep === 0 && !validateShippingForm()) {
-      return;
+  const handlePaymentResult = async (errorMsg, paymentIntentResult, processing) => {
+    setPaymentProcessing(processing);
+    setPaymentError(errorMsg || '');
+
+    if (errorMsg || processing) {
+      return; 
     }
 
-    if (activeStep === steps.length - 1) {
-      setIsSubmitting(true);
-      setSubmitError('');
-      
-      try {
-        // Validate checkout data with the backend
-        const response = await axios.post('/api/checkout', {
-          shipping: shippingData
+    if (paymentIntentResult?.status === 'succeeded') {
+      setPaymentIntentId(paymentIntentResult.id);
+      setActiveStep((prevStep) => prevStep + 1);
+    } else {
+      console.warn("Payment not succeeded:", paymentIntentResult);
+      setPaymentError(`Payment status: ${paymentIntentResult?.status || 'Unknown'}. Please try again.`);
+    }
+  };
+
+  const handlePlaceOrder = async () => {
+    if (!paymentIntentId) {
+        setSubmitError("Cannot place order without a successful payment confirmation.");
+        return;
+    }
+
+    setIsSubmitting(true);
+    setSubmitError('');
+    try {
+        const response = await axios.post('/api/checkout', { 
+          shipping: shippingData,
+          paymentIntentId: paymentIntentId
         });
 
         if (response.data.status === 'success') {
-          // For Week 3, we just show success
-          // In Week 4, we'll handle actual order creation
-          navigate('/checkout/success');
+          clearCart(); 
+          navigate('/checkout/success', { state: { order: response.data.order } }); 
+        } else {
+           setSubmitError(response.data.message || 'Failed to finalize order after payment.');
         }
-      } catch (error) {
+      } catch (orderError) {
+        console.error("Order placement error:", orderError);
         setSubmitError(
-          error.response?.data?.message || 
-          'Failed to validate checkout data. Please try again.'
+          orderError.response?.data?.message || 
+          'Payment succeeded, but failed to finalize order. Please contact support. Reference ID: ' + paymentIntentId
         );
       } finally {
         setIsSubmitting(false);
       }
-    } else {
+  }
+
+  const handleNext = async () => {
+    setSubmitError(''); 
+    setPaymentError(''); 
+
+    if (activeStep === 0) {
+      if (!validateShippingForm()) {
+        return;
+      }
       setActiveStep((prevStep) => prevStep + 1);
-    }
+    } 
   };
 
   const handleBack = () => {
+    if (activeStep === 2 || activeStep === 1) {
+      setPaymentError('');
+    }
     setActiveStep((prevStep) => prevStep - 1);
   };
 
@@ -149,6 +289,9 @@ const Checkout = () => {
       ...prev,
       [name]: value
     }));
+    if (errors[name]) { 
+      setErrors(prev => ({ ...prev, [name]: '' }));
+    }
   };
 
   const getStepContent = (step) => {
@@ -265,9 +408,14 @@ const Checkout = () => {
         );
       case 1:
         return (
-          <Typography variant="h6" gutterBottom>
-            Payment method
-          </Typography>
+          <PaymentForm 
+            cart={cart}
+            shippingData={shippingData}
+            clientSecret={clientSecret}
+            onSubmit={handlePaymentResult}
+            processing={paymentProcessing}
+            error={paymentError} 
+          />
         );
       case 2:
         return (
@@ -306,13 +454,38 @@ const Checkout = () => {
               ))}
             </Grid>
             <Divider sx={{ my: 2 }} />
+            <Typography variant="h6" gutterBottom>
+              Shipping Details
+            </Typography>
+            <Typography>{shippingData.firstName} {shippingData.lastName}</Typography>
+            <Typography>{shippingData.address1}</Typography>
+            {shippingData.address2 && <Typography>{shippingData.address2}</Typography>}
+            <Typography>{shippingData.city}, {shippingData.state} {shippingData.zip}</Typography>
+            <Typography>{shippingData.country}</Typography>
+            <Typography>Phone: {shippingData.phone}</Typography>
+            <Divider sx={{ my: 2 }} />
             <Grid container spacing={2}>
               <Grid item xs={12}>
-                <Typography variant="h6">
-                  Total: ${cart?.items?.reduce((sum, item) => sum + (item.price * item.quantity), 0).toFixed(2)}
+                <Typography variant="h5">
+                  Total: ${cart?.total?.toFixed(2) || '0.00'}
                 </Typography>
               </Grid>
             </Grid>
+            {submitError && (
+              <Alert severity="error" sx={{ mt: 2 }}>
+                {submitError}
+              </Alert>
+            )}
+            <Button
+                variant="contained"
+                color="primary"
+                onClick={handlePlaceOrder}
+                disabled={isSubmitting || !paymentIntentId}
+                sx={{ mt: 3 }}
+                fullWidth
+              >
+                {isSubmitting ? <CircularProgress size={24} /> : 'Place Order'}
+            </Button>
           </Box>
         );
       default:
@@ -347,42 +520,41 @@ const Checkout = () => {
               Thank you for your order.
             </Typography>
             <Typography variant="subtitle1">
-              Your order number is #2001539. We have emailed your order
-              confirmation, and will send you an update when your order has
-              shipped.
+              Your order details should be displayed here or fetched based on state.
             </Typography>
+            <Button onClick={() => navigate('/')} sx={{ mt: 2 }}>Continue Shopping</Button>
           </Box>
         ) : (
           <>
-            {submitError && (
-              <Alert severity="error" sx={{ mb: 2 }}>
-                {submitError}
-              </Alert>
-            )}
             {getStepContent(activeStep)}
             <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 3 }}>
               {activeStep !== 0 && (
-                <Button onClick={handleBack} sx={{ mr: 1 }}>
+                <Button onClick={handleBack} sx={{ mr: 1 }} disabled={isSubmitting || paymentProcessing}>
                   Back
                 </Button>
               )}
-              <Button
-                variant="contained"
-                onClick={handleNext}
-                color={activeStep === steps.length - 1 ? 'secondary' : 'primary'}
-                disabled={isSubmitting}
-              >
-                {isSubmitting ? (
-                  <CircularProgress size={24} color="inherit" />
-                ) : (
-                  activeStep === steps.length - 1 ? 'Place order' : 'Next'
-                )}
-              </Button>
+              {activeStep === 0 && (
+                <Button
+                  variant="contained"
+                  onClick={handleNext} 
+                  disabled={isSubmitting || paymentProcessing || cart?.items?.length === 0} 
+                >
+                  Next
+                </Button>
+              )}
             </Box>
           </>
         )}
       </Paper>
     </Container>
+  );
+};
+
+const Checkout = () => {
+  return (
+    <Elements stripe={stripePromise}>
+      <CheckoutContent />
+    </Elements>
   );
 };
 

@@ -66,7 +66,13 @@ const Navbar = () => {
               >
                 Profile
               </Button>
-
+              <Button
+                color="inherit"
+                component={RouterLink}
+                to="/orders"
+              >
+                Orders
+              </Button>
               <Button
                 color="inherit"
                 onClick={handleLogout}
