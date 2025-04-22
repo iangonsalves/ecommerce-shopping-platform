@@ -12,7 +12,7 @@ import {
   CircularProgress
 } from '@mui/material';
 import { useAuth } from '../context/AuthContext';
-import axios from 'axios';
+import api from '../services/api';
 
 const Profile = () => {
   const { user, setUser } = useAuth();
@@ -56,7 +56,7 @@ const Profile = () => {
     setSuccess('');
 
     try {
-      const response = await axios.put('/api/user/profile', {
+      const response = await api.put('/user/profile', {
         name: formData.name,
         email: formData.email
       });
@@ -85,7 +85,7 @@ const Profile = () => {
     }
 
     try {
-      await axios.put('/api/user/password', {
+      await api.put('/user/password', {
         current_password: formData.current_password,
         new_password: formData.new_password,
         new_password_confirmation: formData.new_password_confirmation

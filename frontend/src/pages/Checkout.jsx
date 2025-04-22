@@ -1,28 +1,28 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Container,
   Typography,
+  Paper,
   Stepper,
   Step,
   StepLabel,
-  Button,
   Box,
-  Paper,
   Grid,
   TextField,
-  Divider,
+  Button,
   CircularProgress,
-  Alert
+  Alert,
+  Divider
 } from '@mui/material';
+import { Elements } from '@stripe/react-stripe-js';
+import { CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
+import api from '../services/api';
 import { useCart } from '../context/CartContext';
-import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import { loadStripe } from '@stripe/stripe-js';
-import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
+import { useAuth } from '../context/AuthContext';
+import stripePromise from '../config/stripe';
 
 const steps = ['Shipping Address', 'Payment Details', 'Review Order'];
-
-const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || 'YOUR_STRIPE_PUBLISHABLE_KEY');
 
 const initialShippingData = {
   firstName: '',
@@ -47,52 +47,41 @@ const initialErrors = {
   phone: ''
 };
 
-const PaymentForm = ({ cart, shippingData, clientSecret, onSubmit, processing, error }) => {
+const PaymentForm = ({ clientSecret, setPaymentError, onPaymentSuccess, total }) => {
   const stripe = useStripe();
   const elements = useElements();
+  const [error, setError] = useState('');
+  const [processing, setProcessing] = useState(false);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    onSubmit(null, null, true);
 
     if (!stripe || !elements || !clientSecret) {
-      console.error('Stripe.js not loaded or no client secret');
-      onSubmit('Payment system not ready. Please wait or refresh.', null, false);
       return;
     }
-    
-    console.log('Using Client Secret:', clientSecret);
 
-    const cardElement = elements.getElement(CardElement);
-    if (!cardElement) {
-        onSubmit('Card details not found. Please try again.', null, false);
-        return;
-    }
+    setProcessing(true);
+    setError('');
+    setPaymentError('');
 
-    const { error: paymentError, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
-      payment_method: {
-        card: cardElement,
-        billing_details: {
-          name: `${shippingData.firstName} ${shippingData.lastName}`,
-          address: {
-            line1: shippingData.address1 || '',
-            line2: shippingData.address2 || null,
-            city: shippingData.city || '',
-            state: shippingData.state || '',
-            postal_code: shippingData.zip || '',
-            country: shippingData.country || '',
-          },
-          phone: shippingData.phone || null,
+    try {
+      const { error: stripeError, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
+        payment_method: {
+          card: elements.getElement(CardElement),
         },
-      },
-    });
+      });
 
-    if (paymentError) {
-      console.error("Stripe payment error object:", paymentError);
-      const message = paymentError.message || 'An unknown payment error occurred.';
-      onSubmit(message, null, false);
-    } else {
-      onSubmit(null, paymentIntent, false);
+      if (stripeError) {
+        setError(stripeError.message);
+        setPaymentError(stripeError.message);
+      } else if (paymentIntent.status === 'succeeded') {
+        onPaymentSuccess(paymentIntent.id);
+      }
+    } catch (err) {
+      setError('An unexpected error occurred.');
+      setPaymentError('An unexpected error occurred.');
+    } finally {
+      setProcessing(false);
     }
   };
 
@@ -114,7 +103,7 @@ const PaymentForm = ({ cart, shippingData, clientSecret, onSubmit, processing, e
         disabled={!stripe || !elements || !clientSecret || processing}
         fullWidth
       >
-        {processing ? <CircularProgress size={24} /> : `Pay $${cart?.total?.toFixed(2) || '0.00'}`}
+        {processing ? <CircularProgress size={24} /> : `Pay $${total?.toFixed(2) || '0.00'}`}
       </Button>
     </form>
   );
@@ -127,6 +116,7 @@ const CheckoutContent = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState('');
   const { cart, loading: cartLoading, clearCart } = useCart();
+  const { user } = useAuth();
   const navigate = useNavigate();
   const [clientSecret, setClientSecret] = useState('');
   const [paymentProcessing, setPaymentProcessing] = useState(false);
@@ -135,162 +125,94 @@ const CheckoutContent = () => {
 
   useEffect(() => {
     const fetchPaymentIntent = async () => {
-        if (activeStep === 1 && cart?.items?.length > 0 && !clientSecret && !paymentProcessing) {
-            setPaymentProcessing(true);
-            setPaymentError('');
-            try {
-                const response = await axios.post('/api/create-payment-intent'); 
-                if (response.data.clientSecret) {
-                    setClientSecret(response.data.clientSecret);
-                } else {
-                    setPaymentError('Could not initialize payment. Please try again.');
-                }
-            } catch (error) {
-                console.error("Error fetching payment intent:", error);
-                setPaymentError(error.response?.data?.error || 'Failed to initialize payment system. Please refresh or try again later.');
-            } finally {
-                setPaymentProcessing(false);
-            }
+      if (activeStep === 1 && cart?.items?.length > 0 && !clientSecret && !paymentProcessing) {
+        setPaymentProcessing(true);
+        setPaymentError('');
+        try {
+          const response = await api.post('/create-payment-intent', {
+            amount: cart.total * 100, // Convert to cents
+            currency: 'usd'
+          });
+          if (response.data.clientSecret) {
+            setClientSecret(response.data.clientSecret);
+          } else {
+            setPaymentError('Could not initialize payment. Please try again.');
+          }
+        } catch (error) {
+          console.error("Error fetching payment intent:", error);
+          setPaymentError(error.response?.data?.error || 'Failed to initialize payment system. Please refresh or try again later.');
+        } finally {
+          setPaymentProcessing(false);
         }
+      }
     };
 
     fetchPaymentIntent();
-    
-    if (activeStep !== 1 && clientSecret) {
-      setClientSecret('');
-    }
+  }, [activeStep, cart?.items, cart?.total, clientSecret, paymentProcessing]);
 
-  }, [activeStep, cart?.items, clientSecret, paymentProcessing]); 
-
-  const validateShippingForm = () => {
-    const newErrors = { ...initialErrors };
-    let isValid = true;
-
-    if (!shippingData.firstName.trim()) {
-      newErrors.firstName = 'First name is required';
-      isValid = false;
-    }
-
-    if (!shippingData.lastName.trim()) {
-      newErrors.lastName = 'Last name is required';
-      isValid = false;
-    }
-
-    if (!shippingData.address1.trim()) {
-      newErrors.address1 = 'Address is required';
-      isValid = false;
-    }
-
-    if (!shippingData.city.trim()) {
-      newErrors.city = 'City is required';
-      isValid = false;
-    }
-
-    if (!shippingData.state.trim()) {
-      newErrors.state = 'State is required';
-      isValid = false;
-    }
-
-    if (!shippingData.zip.trim()) {
-      newErrors.zip = 'ZIP code is required';
-      isValid = false;
-    } else if (!/^\d{5}(-\d{4})?$/.test(shippingData.zip)) {
-      newErrors.zip = 'Invalid ZIP code format';
-      isValid = false;
-    }
-
-    if (!shippingData.country.trim()) {
-      newErrors.country = 'Country is required';
-      isValid = false;
-    }
-
-    if (!shippingData.phone.trim()) {
-      newErrors.phone = 'Phone number is required';
-      isValid = false;
-    } else if (!/^\+?[\d\s-]{10,}$/.test(shippingData.phone)) {
-      newErrors.phone = 'Invalid phone number format';
-      isValid = false;
-    }
-
-    setErrors(newErrors);
-    return isValid;
+  const handleNext = () => {
+    setActiveStep((prevActiveStep) => prevActiveStep + 1);
   };
 
-  const handlePaymentResult = async (errorMsg, paymentIntentResult, processing) => {
-    setPaymentProcessing(processing);
-    setPaymentError(errorMsg || '');
+  const handleBack = () => {
+    setActiveStep((prevActiveStep) => prevActiveStep - 1);
+  };
 
-    if (errorMsg || processing) {
-      return; 
+  const handleShippingSubmit = (e) => {
+    e.preventDefault();
+    // Validate shipping data
+    const newErrors = {};
+    let hasError = false;
+
+    Object.keys(shippingData).forEach(field => {
+      if (field !== 'address2' && !shippingData[field]) {
+        newErrors[field] = 'This field is required';
+        hasError = true;
+      }
+    });
+
+    if (hasError) {
+      setErrors(newErrors);
+      return;
     }
 
-    if (paymentIntentResult?.status === 'succeeded') {
-      setPaymentIntentId(paymentIntentResult.id);
-      setActiveStep((prevStep) => prevStep + 1);
-    } else {
-      console.warn("Payment not succeeded:", paymentIntentResult);
-      setPaymentError(`Payment status: ${paymentIntentResult?.status || 'Unknown'}. Please try again.`);
-    }
+    handleNext();
+  };
+
+  const handlePaymentSuccess = async (paymentIntentId) => {
+    setPaymentIntentId(paymentIntentId);
+    handleNext();
   };
 
   const handlePlaceOrder = async () => {
     if (!paymentIntentId) {
-        setSubmitError("Cannot place order without a successful payment confirmation.");
-        return;
+      setSubmitError('Payment information is missing');
+      return;
     }
 
     setIsSubmitting(true);
     setSubmitError('');
+
     try {
-        const response = await axios.post('/api/checkout', { 
-          shipping: shippingData,
-          paymentIntentId: paymentIntentId
+      const response = await api.post('/checkout', {
+        shipping: shippingData,
+        payment_intent_id: paymentIntentId
+      });
+
+      if (response.data.status === 'success') {
+        clearCart();
+        navigate('/checkout/success', { 
+          state: { 
+            orderId: response.data.order.id
+          }
         });
-
-        if (response.data.status === 'success') {
-          clearCart(); 
-          navigate('/checkout/success', { state: { order: response.data.order } }); 
-        } else {
-           setSubmitError(response.data.message || 'Failed to finalize order after payment.');
-        }
-      } catch (orderError) {
-        console.error("Order placement error:", orderError);
-        setSubmitError(
-          orderError.response?.data?.message || 
-          'Payment succeeded, but failed to finalize order. Please contact support. Reference ID: ' + paymentIntentId
-        );
-      } finally {
-        setIsSubmitting(false);
+      } else {
+        setSubmitError('Failed to place order. Please try again.');
       }
-  }
-
-  const handleNext = async () => {
-    setSubmitError(''); 
-    setPaymentError(''); 
-
-    if (activeStep === 0) {
-      if (!validateShippingForm()) {
-        return;
-      }
-      setActiveStep((prevStep) => prevStep + 1);
-    } 
-  };
-
-  const handleBack = () => {
-    if (activeStep === 2 || activeStep === 1) {
-      setPaymentError('');
-    }
-    setActiveStep((prevStep) => prevStep - 1);
-  };
-
-  const handleShippingInput = (e) => {
-    const { name, value } = e.target;
-    setShippingData((prev) => ({
-      ...prev,
-      [name]: value
-    }));
-    if (errors[name]) { 
-      setErrors(prev => ({ ...prev, [name]: '' }));
+    } catch (error) {
+      setSubmitError(error.response?.data?.message || 'Failed to place order');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -298,124 +220,155 @@ const CheckoutContent = () => {
     switch (step) {
       case 0:
         return (
-          <Grid container spacing={3}>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                required
-                fullWidth
-                label="First name"
-                name="firstName"
-                value={shippingData.firstName}
-                onChange={handleShippingInput}
-                error={!!errors.firstName}
-                helperText={errors.firstName}
-              />
+          <Box component="form" onSubmit={handleShippingSubmit}>
+            <Grid container spacing={3}>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  required
+                  fullWidth
+                  label="First Name"
+                  name="firstName"
+                  value={shippingData.firstName}
+                  onChange={(e) => {
+                    setShippingData({ ...shippingData, firstName: e.target.value });
+                    setErrors({ ...errors, firstName: '' });
+                  }}
+                  error={!!errors.firstName}
+                  helperText={errors.firstName}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  required
+                  fullWidth
+                  label="Last Name"
+                  name="lastName"
+                  value={shippingData.lastName}
+                  onChange={(e) => {
+                    setShippingData({ ...shippingData, lastName: e.target.value });
+                    setErrors({ ...errors, lastName: '' });
+                  }}
+                  error={!!errors.lastName}
+                  helperText={errors.lastName}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  required
+                  fullWidth
+                  label="Address Line 1"
+                  name="address1"
+                  value={shippingData.address1}
+                  onChange={(e) => {
+                    setShippingData({ ...shippingData, address1: e.target.value });
+                    setErrors({ ...errors, address1: '' });
+                  }}
+                  error={!!errors.address1}
+                  helperText={errors.address1}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  fullWidth
+                  label="Address Line 2"
+                  name="address2"
+                  value={shippingData.address2}
+                  onChange={(e) => setShippingData({ ...shippingData, address2: e.target.value })}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  required
+                  fullWidth
+                  label="City"
+                  name="city"
+                  value={shippingData.city}
+                  onChange={(e) => {
+                    setShippingData({ ...shippingData, city: e.target.value });
+                    setErrors({ ...errors, city: '' });
+                  }}
+                  error={!!errors.city}
+                  helperText={errors.city}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  required
+                  fullWidth
+                  label="State/Province"
+                  name="state"
+                  value={shippingData.state}
+                  onChange={(e) => {
+                    setShippingData({ ...shippingData, state: e.target.value });
+                    setErrors({ ...errors, state: '' });
+                  }}
+                  error={!!errors.state}
+                  helperText={errors.state}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  required
+                  fullWidth
+                  label="ZIP/Postal Code"
+                  name="zip"
+                  value={shippingData.zip}
+                  onChange={(e) => {
+                    setShippingData({ ...shippingData, zip: e.target.value });
+                    setErrors({ ...errors, zip: '' });
+                  }}
+                  error={!!errors.zip}
+                  helperText={errors.zip}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  required
+                  fullWidth
+                  label="Country"
+                  name="country"
+                  value={shippingData.country}
+                  onChange={(e) => {
+                    setShippingData({ ...shippingData, country: e.target.value });
+                    setErrors({ ...errors, country: '' });
+                  }}
+                  error={!!errors.country}
+                  helperText={errors.country}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  required
+                  fullWidth
+                  label="Phone Number"
+                  name="phone"
+                  value={shippingData.phone}
+                  onChange={(e) => {
+                    setShippingData({ ...shippingData, phone: e.target.value });
+                    setErrors({ ...errors, phone: '' });
+                  }}
+                  error={!!errors.phone}
+                  helperText={errors.phone}
+                />
+              </Grid>
             </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                required
-                fullWidth
-                label="Last name"
-                name="lastName"
-                value={shippingData.lastName}
-                onChange={handleShippingInput}
-                error={!!errors.lastName}
-                helperText={errors.lastName}
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                required
-                fullWidth
-                label="Address line 1"
-                name="address1"
-                value={shippingData.address1}
-                onChange={handleShippingInput}
-                error={!!errors.address1}
-                helperText={errors.address1}
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                fullWidth
-                label="Address line 2"
-                name="address2"
-                value={shippingData.address2}
-                onChange={handleShippingInput}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                required
-                fullWidth
-                label="City"
-                name="city"
-                value={shippingData.city}
-                onChange={handleShippingInput}
-                error={!!errors.city}
-                helperText={errors.city}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                required
-                fullWidth
-                label="State/Province/Region"
-                name="state"
-                value={shippingData.state}
-                onChange={handleShippingInput}
-                error={!!errors.state}
-                helperText={errors.state}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                required
-                fullWidth
-                label="Zip / Postal code"
-                name="zip"
-                value={shippingData.zip}
-                onChange={handleShippingInput}
-                error={!!errors.zip}
-                helperText={errors.zip}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                required
-                fullWidth
-                label="Country"
-                name="country"
-                value={shippingData.country}
-                onChange={handleShippingInput}
-                error={!!errors.country}
-                helperText={errors.country}
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                required
-                fullWidth
-                label="Phone number"
-                name="phone"
-                value={shippingData.phone}
-                onChange={handleShippingInput}
-                error={!!errors.phone}
-                helperText={errors.phone}
-              />
-            </Grid>
-          </Grid>
+            <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 3 }}>
+              <Button type="submit" variant="contained" color="primary">
+                Next
+              </Button>
+            </Box>
+          </Box>
         );
       case 1:
         return (
-          <PaymentForm 
-            cart={cart}
-            shippingData={shippingData}
-            clientSecret={clientSecret}
-            onSubmit={handlePaymentResult}
-            processing={paymentProcessing}
-            error={paymentError} 
-          />
+          <Elements stripe={stripePromise}>
+            <PaymentForm
+              clientSecret={clientSecret}
+              setPaymentError={setPaymentError}
+              onPaymentSuccess={handlePaymentSuccess}
+              total={cart?.total}
+            />
+          </Elements>
         );
       case 2:
         return (
@@ -430,7 +383,7 @@ const CheckoutContent = () => {
                     <Grid container spacing={2} alignItems="center">
                       <Grid item xs={3}>
                         <img
-                          src={item.product.image || 'https://via.placeholder.com/100'}
+                          src={item.product.image || item.product.image_url || 'https://via.placeholder.com/100'}
                           alt={item.product.name}
                           style={{ width: '100%', height: 'auto' }}
                         />
@@ -477,14 +430,14 @@ const CheckoutContent = () => {
               </Alert>
             )}
             <Button
-                variant="contained"
-                color="primary"
-                onClick={handlePlaceOrder}
-                disabled={isSubmitting || !paymentIntentId}
-                sx={{ mt: 3 }}
-                fullWidth
-              >
-                {isSubmitting ? <CircularProgress size={24} /> : 'Place Order'}
+              variant="contained"
+              color="primary"
+              onClick={handlePlaceOrder}
+              disabled={isSubmitting || !paymentIntentId}
+              sx={{ mt: 3 }}
+              fullWidth
+            >
+              {isSubmitting ? <CircularProgress size={24} /> : 'Place Order'}
             </Button>
           </Box>
         );
@@ -496,14 +449,26 @@ const CheckoutContent = () => {
   if (cartLoading) {
     return (
       <Container>
-        <Typography>Loading...</Typography>
+        <Box display="flex" justifyContent="center" alignItems="center" minHeight="60vh">
+          <CircularProgress />
+        </Box>
+      </Container>
+    );
+  }
+
+  if (!cart || !cart.items || cart.items.length === 0) {
+    return (
+      <Container>
+        <Alert severity="info" sx={{ mt: 2 }}>
+          Your cart is empty. Please add items before proceeding to checkout.
+        </Alert>
       </Container>
     );
   }
 
   return (
     <Container maxWidth="lg" sx={{ mb: 4 }}>
-      <Paper sx={{ p: 3, my: 3 }}>
+      <Paper sx={{ p: { xs: 2, md: 3 } }}>
         <Typography component="h1" variant="h4" align="center" gutterBottom>
           Checkout
         </Typography>
@@ -514,36 +479,11 @@ const CheckoutContent = () => {
             </Step>
           ))}
         </Stepper>
-        {activeStep === steps.length ? (
-          <Box sx={{ textAlign: 'center' }}>
-            <Typography variant="h5" gutterBottom>
-              Thank you for your order.
-            </Typography>
-            <Typography variant="subtitle1">
-              Your order details should be displayed here or fetched based on state.
-            </Typography>
-            <Button onClick={() => navigate('/')} sx={{ mt: 2 }}>Continue Shopping</Button>
+        {getStepContent(activeStep)}
+        {activeStep !== 0 && activeStep !== 2 && (
+          <Box sx={{ display: 'flex', justifyContent: 'flex-start', mt: 3 }}>
+            <Button onClick={handleBack}>Back</Button>
           </Box>
-        ) : (
-          <>
-            {getStepContent(activeStep)}
-            <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 3 }}>
-              {activeStep !== 0 && (
-                <Button onClick={handleBack} sx={{ mr: 1 }} disabled={isSubmitting || paymentProcessing}>
-                  Back
-                </Button>
-              )}
-              {activeStep === 0 && (
-                <Button
-                  variant="contained"
-                  onClick={handleNext} 
-                  disabled={isSubmitting || paymentProcessing || cart?.items?.length === 0} 
-                >
-                  Next
-                </Button>
-              )}
-            </Box>
-          </>
         )}
       </Paper>
     </Container>
@@ -552,9 +492,7 @@ const CheckoutContent = () => {
 
 const Checkout = () => {
   return (
-    <Elements stripe={stripePromise}>
-      <CheckoutContent />
-    </Elements>
+    <CheckoutContent />
   );
 };
 

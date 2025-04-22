@@ -11,7 +11,7 @@ import {
   Alert,
   CircularProgress
 } from '@mui/material';
-import axios from 'axios';
+import api from '../services/api';
 import { useCart } from '../context/CartContext';
 
 const ProductDetail = () => {
@@ -26,7 +26,7 @@ const ProductDetail = () => {
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        const response = await axios.get(`/api/products/${id}`);
+        const response = await api.get(`/products/${id}`);
         setProduct(response.data);
       } catch (error) {
         setError('Error fetching product details');
