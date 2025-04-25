@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Container, Grid, Card, CardContent, Typography, CardActionArea } from '@mui/material';
 import { Link } from 'react-router-dom';
-import axios from 'axios';
+import api from '../services/api';
 
 const CategoryList = () => {
   const [categories, setCategories] = useState([]);
@@ -10,7 +10,7 @@ const CategoryList = () => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await axios.get('/api/categories');
+        const response = await api.get('/categories');
         setCategories(response.data);
         setLoading(false);
       } catch (error) {

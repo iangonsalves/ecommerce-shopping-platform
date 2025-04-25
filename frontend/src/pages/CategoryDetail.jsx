@@ -9,26 +9,31 @@ import {
   CardMedia,
   CardActionArea,
   Button,
-  Box
+  Box,
+  CircularProgress,
+  Alert
 } from '@mui/material';
 import { Link } from 'react-router-dom';
-import axios from 'axios';
+import api from '../services/api';
 import { useCart } from '../context/CartContext';
 
 const CategoryDetail = () => {
   const { id } = useParams();
   const [category, setCategory] = useState(null);
   const [loading, setLoading] = useState(true);
-  const { addToCart } = useCart();
+  const [error, setError] = useState('');
+  const { addToCart, loading: cartLoading } = useCart();
 
   useEffect(() => {
     const fetchCategory = async () => {
       try {
-        const response = await axios.get(`/api/categories/${id}`);
+        const response = await api.get(`/categories/${id}`);
         setCategory(response.data);
-        setLoading(false);
+        setError('');
       } catch (error) {
         console.error('Error fetching category:', error);
+        setError('Failed to load category');
+      } finally {
         setLoading(false);
       }
     };
@@ -44,11 +49,33 @@ const CategoryDetail = () => {
   };
 
   if (loading) {
-    return <Typography>Loading...</Typography>;
+    return (
+      <Container>
+        <Box display="flex" justifyContent="center" alignItems="center" minHeight="60vh">
+          <CircularProgress />
+        </Box>
+      </Container>
+    );
+  }
+
+  if (error) {
+    return (
+      <Container>
+        <Alert severity="error" sx={{ mt: 2 }}>
+          {error}
+        </Alert>
+      </Container>
+    );
   }
 
   if (!category) {
-    return <Typography>Category not found</Typography>;
+    return (
+      <Container>
+        <Alert severity="info" sx={{ mt: 2 }}>
+          Category not found
+        </Alert>
+      </Container>
+    );
   }
 
   return (
@@ -69,7 +96,7 @@ const CategoryDetail = () => {
                 <CardMedia
                   component="img"
                   height="140"
-                  image={product.image || 'https://via.placeholder.com/140'}
+                  image={product.image || product.image_url || 'https://via.placeholder.com/140'}
                   alt={product.name}
                 />
                 <CardContent>
@@ -80,7 +107,7 @@ const CategoryDetail = () => {
                     {product.description}
                   </Typography>
                   <Typography variant="h6" color="primary">
-                    ${product.price}
+                    ${product.price.toFixed(2)}
                   </Typography>
                 </CardContent>
               </CardActionArea>
@@ -90,8 +117,9 @@ const CategoryDetail = () => {
                   color="primary"
                   fullWidth
                   onClick={() => handleAddToCart(product.id)}
+                  disabled={cartLoading}
                 >
-                  Add to Cart
+                  {cartLoading ? 'Adding...' : 'Add to Cart'}
                 </Button>
               </Box>
             </Card>

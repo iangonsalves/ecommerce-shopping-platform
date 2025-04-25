@@ -15,7 +15,7 @@ import {
   Alert
 } from '@mui/material';
 import { useAuth } from '../context/AuthContext';
-import axios from 'axios';
+import api from '../services/api';
 
 const OrderHistory = () => {
   const [orders, setOrders] = useState([]);
@@ -26,7 +26,7 @@ const OrderHistory = () => {
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const response = await axios.get('/api/orders');
+        const response = await api.get('/orders');
         setOrders(response.data.data);
         setLoading(false);
       } catch (err) {

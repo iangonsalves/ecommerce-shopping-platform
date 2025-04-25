@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import theme from './theme';
@@ -29,6 +29,13 @@ import { CartProvider } from './context/CartContext';
 
 // Protected route component
 import PrivateRoute from './components/common/PrivateRoute';
+import AdminLayout from './components/admin/AdminLayout';
+import AdminRoute from './components/admin/AdminRoute';
+import Dashboard from './pages/admin/Dashboard';
+import ProductManagement from './pages/admin/ProductManagement';
+import CategoryManagement from './pages/admin/CategoryManagement';
+import OrderManagement from './pages/admin/OrderManagement';
+import UserManagement from './pages/admin/UserManagement';
 
 function App() {
   return (
@@ -53,7 +60,21 @@ function App() {
                   <Route path="/checkout/success" element={<PrivateRoute><OrderSuccess /></PrivateRoute>} />
                   <Route path="/orders" element={<PrivateRoute><OrderHistory /></PrivateRoute>} />
                   <Route path="/profile" element={<PrivateRoute><Profile /></PrivateRoute>} />
-                  <Route path="*" element={<NotFound />} />
+                  <Route
+                    path="/admin"
+                    element={
+                      <AdminRoute>
+                        <AdminLayout />
+                      </AdminRoute>
+                    }
+                  >
+                    <Route index element={<Dashboard />} />
+                    <Route path="products" element={<ProductManagement />} />
+                    <Route path="categories" element={<CategoryManagement />} />
+                    <Route path="orders" element={<OrderManagement />} />
+                    <Route path="users" element={<UserManagement />} />
+                  </Route>
+                  <Route path="*" element={<Navigate to="/" replace />} />
                 </Routes>
               </main>
               <Footer />

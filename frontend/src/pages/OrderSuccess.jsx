@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate, Link as RouterLink } from 'react-router-dom';
 import {
   Container,
@@ -10,29 +10,70 @@ import {
   ListItem,
   ListItemText,
   Divider,
-  Alert
+  Alert,
+  CircularProgress
 } from '@mui/material';
+import api from '../services/api';
 
 const OrderSuccess = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const order = location.state?.order; // Get order details passed from checkout
+  const [loading, setLoading] = useState(true);
+  const [order, setOrder] = useState(null);
+  const orderId = location.state?.orderId;
 
-  // Redirect if no order data is found (e.g., direct navigation)
+  useEffect(() => {
+    const fetchOrderDetails = async () => {
+      if (!orderId) {
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const response = await api.get(`/orders/${orderId}`);
+        setOrder(response.data);
+      } catch (error) {
+        console.error('Error fetching order details:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchOrderDetails();
+  }, [orderId]);
+
+  if (loading) {
+    return (
+      <Container maxWidth="sm" sx={{ mt: 4 }}>
+        <Box display="flex" justifyContent="center" py={4}>
+          <CircularProgress />
+        </Box>
+      </Container>
+    );
+  }
+
+  // If no order data is found (e.g., direct navigation)
   if (!order) {
     return (
       <Container maxWidth="sm" sx={{ mt: 4 }}>
         <Paper sx={{ p: 3 }}>
-          <Alert severity="warning">
+          <Alert severity="warning" sx={{ mb: 2 }}>
             No order details found. You might have accessed this page directly.
           </Alert>
           <Button 
             variant="contained" 
-            onClick={() => navigate('/')} 
-            sx={{ mt: 2 }}
-            fullWidth
+            component={RouterLink}
+            to="/orders"
+            sx={{ mr: 2 }}
           >
-            Go to Homepage
+            View Orders
+          </Button>
+          <Button 
+            variant="outlined" 
+            component={RouterLink}
+            to="/"
+          >
+            Continue Shopping
           </Button>
         </Paper>
       </Container>
@@ -40,66 +81,59 @@ const OrderSuccess = () => {
   }
 
   return (
-    <Container maxWidth="md" sx={{ mt: 4, mb: 4 }}>
-      <Paper sx={{ p: 4 }}>
-        <Typography variant="h4" component="h1" gutterBottom align="center" color="primary">
-          Thank You For Your Order!
-        </Typography>
-        <Typography variant="subtitle1" align="center" gutterBottom>
-          Your order has been placed successfully.
-        </Typography>
-        
-        <Divider sx={{ my: 3 }} />
+    <Container maxWidth="sm" sx={{ mt: 4 }}>
+      <Paper sx={{ p: 3 }}>
+        <Box textAlign="center" mb={3}>
+          <Typography variant="h4" color="primary" gutterBottom>
+            Order Placed Successfully!
+          </Typography>
+          <Typography variant="subtitle1" color="text.secondary">
+            Thank you for your purchase
+          </Typography>
+        </Box>
+
+        <Divider sx={{ my: 2 }} />
 
         <Typography variant="h6" gutterBottom>
-          Order Summary (ID: {order.id})
+          Order Details
         </Typography>
-        <List disablePadding>
-          {order.items.map((item) => (
-            <ListItem key={item.id} sx={{ py: 1, px: 0 }}>
-              <ListItemText 
-                primary={item.product_name} 
-                secondary={`Quantity: ${item.quantity}`} 
-              />
-              <Typography variant="body2">${(item.price * item.quantity).toFixed(2)}</Typography>
-            </ListItem>
-          ))}
-          <Divider sx={{ my: 1 }} />
-          <ListItem sx={{ py: 1, px: 0 }}>
-            <ListItemText primary="Total" />
-            <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
-              ${parseFloat(order.total).toFixed(2)}
-            </Typography>
+        <List>
+          <ListItem>
+            <ListItemText 
+              primary="Order ID" 
+              secondary={order.id} 
+            />
+          </ListItem>
+          <ListItem>
+            <ListItemText 
+              primary="Total Amount" 
+              secondary={`$${order.total.toFixed(2)}`} 
+            />
+          </ListItem>
+          <ListItem>
+            <ListItemText 
+              primary="Status" 
+              secondary={order.status} 
+            />
           </ListItem>
         </List>
 
-        <Divider sx={{ my: 3 }} />
+        <Divider sx={{ my: 2 }} />
 
-        <Typography variant="h6" gutterBottom>
-          Shipping Address
-        </Typography>
-        <Typography>{order.shipping_first_name} {order.shipping_last_name}</Typography>
-        <Typography>{order.shipping_address1}</Typography>
-        {order.shipping_address2 && <Typography>{order.shipping_address2}</Typography>}
-        <Typography>{order.shipping_city}, {order.shipping_state} {order.shipping_zip}</Typography>
-        <Typography>{order.shipping_country}</Typography>
-        <Typography>Phone: {order.shipping_phone}</Typography>
-
-        <Box sx={{ mt: 4, textAlign: 'center' }}>
+        <Box sx={{ mt: 3, display: 'flex', justifyContent: 'space-between' }}>
           <Button 
             variant="contained" 
-            component={RouterLink} 
-            to="/products"
-            sx={{ mr: 2 }}
+            component={RouterLink}
+            to="/orders"
           >
-            Continue Shopping
+            View All Orders
           </Button>
           <Button 
             variant="outlined" 
-            component={RouterLink} 
-            to="/orders" // Link to order history (we'll create this next)
+            component={RouterLink}
+            to="/"
           >
-            View Order History
+            Continue Shopping
           </Button>
         </Box>
       </Paper>

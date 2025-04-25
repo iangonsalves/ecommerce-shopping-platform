@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import axios from 'axios';
+import api from '../services/api';
 import { useAuth } from './AuthContext';
 
 const CartContext = createContext(null);
@@ -16,19 +16,36 @@ export const CartProvider = ({ children }) => {
   const [cart, setCart] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
 
   const fetchCart = useCallback(async () => {
+    if (authLoading) {
+      setLoading(true);
+      return; // Wait for auth to complete
+    }
+    
     if (!user) {
       setCart(null);
-      setError('Please login to view your cart');
+      setError(null);
       setLoading(false);
       return;
     }
 
     try {
       setLoading(true);
-      const response = await axios.get('/api/cart');
+      const token = localStorage.getItem('token');
+      if (!token) {
+        setCart(null);
+        setError('Please log in to view your cart');
+        setLoading(false);
+        return;
+      }
+
+      const response = await api.get('/cart', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
       setCart(response.data);
       setError(null);
     } catch (err) {
@@ -42,13 +59,11 @@ export const CartProvider = ({ children }) => {
     } finally {
       setLoading(false);
     }
-  }, [user]);
+  }, [user, authLoading]);
 
   useEffect(() => {
-    if (user) {
-      fetchCart();
-    }
-  }, [fetchCart, user]);
+    fetchCart();
+  }, [fetchCart]);
 
   const addToCart = async (productId, quantity = 1) => {
     if (!user) {
@@ -63,7 +78,7 @@ export const CartProvider = ({ children }) => {
       const existingItem = cart?.items?.find(item => item.product_id === productId);
       const newQuantity = existingItem ? existingItem.quantity + quantity : quantity;
 
-      const response = await axios.post('/api/cart/items', {
+      const response = await api.post('/cart/items', {
         product_id: productId,
         quantity: newQuantity
       });
@@ -95,7 +110,7 @@ export const CartProvider = ({ children }) => {
 
     try {
       setLoading(true);
-      const response = await axios.put(`/api/cart/items/${itemId}`, {
+      const response = await api.put(`/cart/items/${itemId}`, {
         quantity
       });
       
@@ -126,7 +141,7 @@ export const CartProvider = ({ children }) => {
 
     try {
       setLoading(true);
-      const response = await axios.delete(`/api/cart/items/${itemId}`);
+      const response = await api.delete(`/cart/items/${itemId}`);
       
       if (response.data && response.data.cart) {
         setCart(response.data.cart);
@@ -159,7 +174,7 @@ export const CartProvider = ({ children }) => {
 
   const value = {
     cart,
-    loading,
+    loading: loading || authLoading,
     error,
     addToCart,
     updateQuantity,
