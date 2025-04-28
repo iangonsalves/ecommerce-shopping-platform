@@ -13,6 +13,7 @@ import ShoppingBagIcon from '@mui/icons-material/ShoppingBag';
 import PeopleIcon from '@mui/icons-material/People';
 import ReceiptIcon from '@mui/icons-material/Receipt';
 import CategoryIcon from '@mui/icons-material/Category';
+import RateReviewIcon from '@mui/icons-material/RateReview';
 import api from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
@@ -41,6 +42,7 @@ const Dashboard = () => {
     users: 0,
     orders: 0,
     categories: 0,
+    reviews: 0
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -100,37 +102,85 @@ const Dashboard = () => {
         Dashboard
       </Typography>
       <Grid container spacing={3}>
-        <Grid item xs={12} sm={6} md={3}>
-          <StatCard
-            title="Products"
-            value={stats.products}
-            icon={<ShoppingBagIcon color="primary" />}
-            loading={loading}
-          />
+        <Grid item xs={12} sm={6} md={4} lg={3}>
+          <Paper
+            sx={{
+              p: 2,
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+            }}
+          >
+            <ShoppingBagIcon color="primary" sx={{ fontSize: 40, mb: 1 }} />
+            <Typography variant="h6" component="h2">
+              Products
+            </Typography>
+            <Typography variant="h4">{stats.products}</Typography>
+          </Paper>
         </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <StatCard
-            title="Users"
-            value={stats.users}
-            icon={<PeopleIcon color="primary" />}
-            loading={loading}
-          />
+        <Grid item xs={12} sm={6} md={4} lg={3}>
+          <Paper
+            sx={{
+              p: 2,
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+            }}
+          >
+            <PeopleIcon color="primary" sx={{ fontSize: 40, mb: 1 }} />
+            <Typography variant="h6" component="h2">
+              Users
+            </Typography>
+            <Typography variant="h4">{stats.users}</Typography>
+          </Paper>
         </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <StatCard
-            title="Orders"
-            value={stats.orders}
-            icon={<ReceiptIcon color="primary" />}
-            loading={loading}
-          />
+        <Grid item xs={12} sm={6} md={4} lg={3}>
+          <Paper
+            sx={{
+              p: 2,
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+            }}
+          >
+            <ReceiptIcon color="primary" sx={{ fontSize: 40, mb: 1 }} />
+            <Typography variant="h6" component="h2">
+              Orders
+            </Typography>
+            <Typography variant="h4">{stats.orders}</Typography>
+          </Paper>
         </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <StatCard
-            title="Categories"
-            value={stats.categories}
-            icon={<CategoryIcon color="primary" />}
-            loading={loading}
-          />
+        <Grid item xs={12} sm={6} md={4} lg={3}>
+          <Paper
+            sx={{
+              p: 2,
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+            }}
+          >
+            <CategoryIcon color="primary" sx={{ fontSize: 40, mb: 1 }} />
+            <Typography variant="h6" component="h2">
+              Categories
+            </Typography>
+            <Typography variant="h4">{stats.categories}</Typography>
+          </Paper>
+        </Grid>
+        <Grid item xs={12} sm={6} md={4} lg={3}>
+          <Paper
+            sx={{
+              p: 2,
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+            }}
+          >
+            <RateReviewIcon color="primary" sx={{ fontSize: 40, mb: 1 }} />
+            <Typography variant="h6" component="h2">
+              Reviews
+            </Typography>
+            <Typography variant="h4">{stats.reviews}</Typography>
+          </Paper>
         </Grid>
       </Grid>
     </Box>
