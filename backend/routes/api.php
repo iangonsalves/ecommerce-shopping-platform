@@ -10,10 +10,12 @@ use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\Admin\ProductController as AdminProductController;
 use App\Http\Controllers\Admin\CategoryController as AdminCategoryController;
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
+use App\Http\Controllers\Admin\ReviewController as AdminReviewController;
 
 /*
 |--------------------------------------------------------------------------
@@ -33,6 +35,7 @@ Route::get('/products', [ProductController::class, 'index']);
 Route::get('/products/{product}', [ProductController::class, 'show']);
 Route::get('/categories', [CategoryController::class, 'index']);
 Route::get('/categories/{category}', [CategoryController::class, 'show']);
+Route::get('/products/{product}/reviews', [ReviewController::class, 'index']);
 
 // Protected routes
 Route::middleware('auth:sanctum')->group(function () {
@@ -46,6 +49,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/create-payment-intent', [PaymentController::class, 'createPaymentIntent']);
     Route::get('/orders', [OrderController::class, 'index']);
     Route::get('/orders/{order}', [OrderController::class, 'show']);
+    Route::post('/products/{product}/reviews', [ReviewController::class, 'store']);
+    Route::put('/products/{product}/reviews/{review}', [ReviewController::class, 'update']);
+    Route::delete('/products/{product}/reviews/{review}', [ReviewController::class, 'destroy']);
 });
 
 // Admin Routes
@@ -73,4 +79,9 @@ Route::middleware(['auth:sanctum', 'admin'])->prefix('admin')->group(function ()
     Route::get('/users', [AdminUserController::class, 'index']);
     Route::put('/users/{user}', [AdminUserController::class, 'update']);
     Route::put('/users/{user}/status', [AdminUserController::class, 'updateStatus']);
+
+    // Reviews Management
+    Route::get('/reviews', [AdminReviewController::class, 'index']);
+    Route::get('/reviews/{review}', [AdminReviewController::class, 'show']);
+    Route::delete('/reviews/{review}', [AdminReviewController::class, 'destroy']);
 }); 

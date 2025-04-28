@@ -7,6 +7,7 @@ use App\Models\Product;
 use App\Models\User;
 use App\Models\Order;
 use App\Models\Category;
+use App\Models\Review;
 use Illuminate\Support\Facades\Log;
 
 class DashboardController extends Controller
@@ -19,12 +20,14 @@ class DashboardController extends Controller
         $usersCount = User::where('role', '!=', 'admin')->count();
         $ordersCount = Order::count();
         $categoriesCount = Category::count();
+        $reviewsCount = Review::count();
         
         Log::info('Stats counts:', [
             'products' => $productsCount,
             'users' => $usersCount,
             'orders' => $ordersCount,
-            'categories' => $categoriesCount
+            'categories' => $categoriesCount,
+            'reviews' => $reviewsCount
         ]);
 
         $stats = [
@@ -32,6 +35,7 @@ class DashboardController extends Controller
             'users' => $usersCount,
             'orders' => $ordersCount,
             'categories' => $categoriesCount,
+            'reviews' => $reviewsCount,
         ];
 
         return response()->json($stats);

@@ -36,6 +36,7 @@ import ProductManagement from './pages/admin/ProductManagement';
 import CategoryManagement from './pages/admin/CategoryManagement';
 import OrderManagement from './pages/admin/OrderManagement';
 import UserManagement from './pages/admin/UserManagement';
+import ReviewManagement from './pages/admin/ReviewManagement';
 
 function App() {
   return (
@@ -73,6 +74,7 @@ function App() {
                     <Route path="categories" element={<CategoryManagement />} />
                     <Route path="orders" element={<OrderManagement />} />
                     <Route path="users" element={<UserManagement />} />
+                    <Route path="reviews" element={<ReviewManagement />} />
                   </Route>
                   <Route path="*" element={<Navigate to="/" replace />} />
                 </Routes>

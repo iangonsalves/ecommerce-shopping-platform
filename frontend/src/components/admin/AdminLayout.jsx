@@ -20,6 +20,7 @@ import PeopleIcon from '@mui/icons-material/People';
 import CategoryIcon from '@mui/icons-material/Category';
 import ReceiptIcon from '@mui/icons-material/Receipt';
 import MenuIcon from '@mui/icons-material/Menu';
+import RateReviewIcon from '@mui/icons-material/RateReview';
 import { useState } from 'react';
 
 const drawerWidth = 240;
@@ -37,6 +38,7 @@ const AdminLayout = () => {
     { text: 'Categories', icon: <CategoryIcon />, path: '/admin/categories' },
     { text: 'Orders', icon: <ReceiptIcon />, path: '/admin/orders' },
     { text: 'Users', icon: <PeopleIcon />, path: '/admin/users' },
+    { text: 'Reviews', icon: <RateReviewIcon />, path: '/admin/reviews' },
   ];
 
   const drawer = (

@@ -9,25 +9,46 @@ import {
   Box,
   TextField,
   Alert,
-  CircularProgress
+  CircularProgress,
+  Rating,
+  Divider,
+  List,
+  ListItem,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions
 } from '@mui/material';
 import api from '../services/api';
 import { useCart } from '../context/CartContext';
+import { useAuth } from '../context/AuthContext';
 
 const ProductDetail = () => {
   const { id } = useParams();
   const { addToCart, loading: cartLoading, error: cartError, refreshCart } = useCart();
+  const { user } = useAuth();
   const [product, setProduct] = useState(null);
+  const [reviews, setReviews] = useState([]);
   const [quantity, setQuantity] = useState(1);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
+  const [reviewDialogOpen, setReviewDialogOpen] = useState(false);
+  const [reviewForm, setReviewForm] = useState({
+    rating: 0,
+    comment: ''
+  });
+  const [reviewError, setReviewError] = useState('');
 
   useEffect(() => {
-    const fetchProduct = async () => {
+    const fetchData = async () => {
       try {
-        const response = await api.get(`/products/${id}`);
-        setProduct(response.data);
+        const [productRes, reviewsRes] = await Promise.all([
+          api.get(`/products/${id}`),
+          api.get(`/products/${id}/reviews`)
+        ]);
+        setProduct(productRes.data);
+        setReviews(reviewsRes.data);
       } catch (error) {
         setError('Error fetching product details');
         console.error('Error:', error);
@@ -36,7 +57,7 @@ const ProductDetail = () => {
       }
     };
 
-    fetchProduct();
+    fetchData();
   }, [id]);
 
   const handleQuantityChange = (e) => {
@@ -53,6 +74,20 @@ const ProductDetail = () => {
       setSuccessMessage('Item added to cart successfully!');
       setQuantity(1);
       refreshCart();
+    }
+  };
+
+  const handleReviewSubmit = async (e) => {
+    e.preventDefault();
+    setReviewError('');
+
+    try {
+      const response = await api.post(`/products/${id}/reviews`, reviewForm);
+      setReviews([response.data, ...reviews]);
+      setReviewDialogOpen(false);
+      setReviewForm({ rating: 0, comment: '' });
+    } catch (error) {
+      setReviewError(error.response?.data?.message || 'Error submitting review');
     }
   };
 
@@ -77,48 +112,45 @@ const ProductDetail = () => {
   }
 
   return (
-    <Container maxWidth="lg">
-      <Paper elevation={3} sx={{ p: 4, mt: 4 }}>
+    <Container>
+      <Paper sx={{ p: 3, mb: 3 }}>
         <Grid container spacing={4}>
           <Grid item xs={12} md={6}>
-            <Box
-              component="img"
+            <img
               src={product.image || product.image_url || 'https://via.placeholder.com/400'}
               alt={product.name}
-              sx={{
-                width: '100%',
-                height: 'auto',
-                maxHeight: '400px',
-                objectFit: 'contain'
-              }}
+              style={{ width: '100%', height: 'auto', maxHeight: '400px', objectFit: 'contain' }}
             />
           </Grid>
           <Grid item xs={12} md={6}>
-            <Typography variant="h4" component="h1" gutterBottom>
+            <Typography variant="h4" gutterBottom>
               {product.name}
             </Typography>
+            <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+              <Rating value={product.average_rating} precision={0.5} readOnly />
+              <Typography variant="body2" sx={{ ml: 1 }}>
+                ({product.reviews_count} reviews)
+              </Typography>
+            </Box>
             <Typography variant="h5" color="primary" gutterBottom>
-              ${product.price.toFixed(2)}
+              ${product.price}
             </Typography>
             <Typography variant="body1" paragraph>
               {product.description}
             </Typography>
-            <Typography variant="body2" color="text.secondary" gutterBottom>
-              Stock: {product.stock} units
+            <Typography variant="body2" color={product.stock > 0 ? 'success.main' : 'error.main'}>
+              {product.stock > 0 ? `${product.stock} in stock` : 'Out of stock'}
             </Typography>
-
-            {cartError && (
-              <Alert severity="error" sx={{ mb: 2 }}>
-                {cartError}
-              </Alert>
-            )}
-
             {successMessage && (
-              <Alert severity="success" sx={{ mb: 2 }}>
+              <Alert severity="success" sx={{ mt: 2 }}>
                 {successMessage}
               </Alert>
             )}
-
+            {cartError && (
+              <Alert severity="error" sx={{ mt: 2 }}>
+                {cartError}
+              </Alert>
+            )}
             <Box sx={{ mt: 2, display: 'flex', gap: 2, alignItems: 'center' }}>
               <TextField
                 type="number"
@@ -140,6 +172,90 @@ const ProductDetail = () => {
           </Grid>
         </Grid>
       </Paper>
+
+      <Paper sx={{ p: 3 }}>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+          <Typography variant="h5">Reviews</Typography>
+          {user && (
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={() => setReviewDialogOpen(true)}
+            >
+              Write a Review
+            </Button>
+          )}
+        </Box>
+        
+        <List>
+          {reviews.length === 0 ? (
+            <Typography variant="body1" color="text.secondary">
+              No reviews yet. Be the first to review this product!
+            </Typography>
+          ) : (
+            reviews.map((review) => (
+              <React.Fragment key={review.id}>
+                <ListItem sx={{ display: 'block' }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                    <Rating value={review.rating} readOnly size="small" />
+                    <Typography variant="body2" sx={{ ml: 1 }}>
+                      by {review.user.name}
+                    </Typography>
+                    {review.verified_purchase && (
+                      <Typography variant="body2" color="success.main" sx={{ ml: 1 }}>
+                        (Verified Purchase)
+                      </Typography>
+                    )}
+                  </Box>
+                  <Typography variant="body1">{review.comment}</Typography>
+                  <Typography variant="caption" color="text.secondary">
+                    {new Date(review.created_at).toLocaleDateString()}
+                  </Typography>
+                </ListItem>
+                <Divider />
+              </React.Fragment>
+            ))
+          )}
+        </List>
+      </Paper>
+
+      <Dialog open={reviewDialogOpen} onClose={() => setReviewDialogOpen(false)}>
+        <DialogTitle>Write a Review</DialogTitle>
+        <DialogContent>
+          {reviewError && (
+            <Alert severity="error" sx={{ mb: 2 }}>
+              {reviewError}
+            </Alert>
+          )}
+          <Box sx={{ my: 2 }}>
+            <Typography component="legend">Rating</Typography>
+            <Rating
+              value={reviewForm.rating}
+              onChange={(event, newValue) => {
+                setReviewForm({ ...reviewForm, rating: newValue });
+              }}
+            />
+          </Box>
+          <TextField
+            fullWidth
+            multiline
+            rows={4}
+            label="Review"
+            value={reviewForm.comment}
+            onChange={(e) => setReviewForm({ ...reviewForm, comment: e.target.value })}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setReviewDialogOpen(false)}>Cancel</Button>
+          <Button
+            onClick={handleReviewSubmit}
+            variant="contained"
+            disabled={!reviewForm.rating}
+          >
+            Submit Review
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Container>
   );
 };
