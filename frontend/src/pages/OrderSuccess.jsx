@@ -34,7 +34,7 @@ const OrderSuccess = () => {
         setOrder(response.data);
       } catch (error) {
         console.error('Error fetching order details:', error);
-      } finally {
+      } finally {  
         setLoading(false);
       }
     };
