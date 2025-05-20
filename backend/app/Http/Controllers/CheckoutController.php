@@ -10,6 +10,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
+use App\Mail\OrderConfirmation;
+use Illuminate\Support\Facades\Mail;
 
 class CheckoutController extends Controller
 {
@@ -90,6 +92,9 @@ class CheckoutController extends Controller
 
             // Commit the transaction
             DB::commit();
+
+            // Send order confirmation email
+            Mail::to($user->email)->send(new OrderConfirmation($order));
 
             // Return success response with order details
             return response()->json([
