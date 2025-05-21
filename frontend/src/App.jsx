@@ -18,6 +18,7 @@ import Cart from './pages/Cart';
 import Checkout from './pages/Checkout';
 import OrderSuccess from './pages/OrderSuccess';
 import OrderHistory from './pages/OrderHistory';
+import OrderDetails from './pages/OrderDetails';
 import Profile from './pages/Profile';
 import CategoryList from './pages/CategoryList';
 import CategoryDetail from './pages/CategoryDetail';
@@ -60,6 +61,7 @@ function App() {
                   <Route path="/checkout" element={<PrivateRoute><Checkout /></PrivateRoute>} />
                   <Route path="/checkout/success" element={<PrivateRoute><OrderSuccess /></PrivateRoute>} />
                   <Route path="/orders" element={<PrivateRoute><OrderHistory /></PrivateRoute>} />
+                  <Route path="/orders/:id" element={<PrivateRoute><OrderDetails /></PrivateRoute>} />
                   <Route path="/profile" element={<PrivateRoute><Profile /></PrivateRoute>} />
                   <Route
                     path="/admin"
@@ -70,11 +72,11 @@ function App() {
                     }
                   >
                     <Route index element={<Dashboard />} />
-                    <Route path="products" element={<ProductManagement />} />
-                    <Route path="categories" element={<CategoryManagement />} />
-                    <Route path="orders" element={<OrderManagement />} />
+                    <Route path="product-management" element={<ProductManagement />} />
+                    <Route path="category-management" element={<CategoryManagement />} />
+                    <Route path="order-management" element={<OrderManagement />} />
                     <Route path="users" element={<UserManagement />} />
-                    <Route path="reviews" element={<ReviewManagement />} />
+                    <Route path="review-management" element={<ReviewManagement />} />
                   </Route>
                   <Route path="*" element={<Navigate to="/" replace />} />
                 </Routes>

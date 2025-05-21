@@ -12,8 +12,11 @@ import {
   Chip,
   Box,
   CircularProgress,
-  Alert
+  Alert,
+  Button
 } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
+import VisibilityIcon from '@mui/icons-material/Visibility';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 
@@ -22,6 +25,7 @@ const OrderHistory = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const { user } = useAuth();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchOrders = async () => {
@@ -94,6 +98,7 @@ const OrderHistory = () => {
                 <TableCell>Total</TableCell>
                 <TableCell>Status</TableCell>
                 <TableCell>Items</TableCell>
+                <TableCell>Actions</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -120,6 +125,15 @@ const OrderHistory = () => {
                         </li>
                       ))}
                     </Box>
+                  </TableCell>
+                  <TableCell>
+                    <Button
+                      startIcon={<VisibilityIcon />}
+                      onClick={() => navigate(`/orders/${order.id}`)}
+                      size="small"
+                    >
+                      View Details
+                    </Button>
                   </TableCell>
                 </TableRow>
               ))}

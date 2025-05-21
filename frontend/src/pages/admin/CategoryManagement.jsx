@@ -35,8 +35,8 @@ const CategoryManagement = () => {
 
   const fetchCategories = async () => {
     try {
-      const response = await api.get('/admin/categories');
-      setCategories(response.data);
+      const response = await api.get('/admin/category-management');
+      setCategories(response.data.data);
       setError('');
     } catch (error) {
       console.error('Error fetching categories:', error);
@@ -83,9 +83,9 @@ const CategoryManagement = () => {
     e.preventDefault();
     try {
       if (selectedCategory) {
-        await api.put(`/admin/categories/${selectedCategory.id}`, formData);
+        await api.put(`/admin/category-management/${selectedCategory.id}`, formData);
       } else {
-        await api.post('/admin/categories', formData);
+        await api.post('/admin/category-management', formData);
       }
       handleClose();
       fetchCategories();
@@ -98,7 +98,7 @@ const CategoryManagement = () => {
   const handleDelete = async (id) => {
     if (window.confirm('Are you sure you want to delete this category?')) {
       try {
-        await api.delete(`/admin/categories/${id}`);
+        await api.delete(`/admin/category-management/${id}`);
         fetchCategories();
       } catch (error) {
         console.error('Error deleting category:', error);

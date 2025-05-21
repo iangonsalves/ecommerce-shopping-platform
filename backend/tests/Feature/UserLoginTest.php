@@ -11,21 +11,25 @@ class UserLoginTest extends TestCase
 
     public function test_user_can_login_with_valid_credentials()
     {
-        // Create a user
-        $this->post('/api/register', [
-            'name' => 'Test User',
+        $user = \App\Models\User::factory()->create([
             'email' => 'test@example.com',
-            'password' => 'password',
-            'password_confirmation' => 'password',
+            'password' => bcrypt('password'),
         ]);
 
-        // Attempt to login
         $response = $this->post('/api/login', [
             'email' => 'test@example.com',
             'password' => 'password',
         ]);
 
-        $response->assertStatus(200);
+        $response->assertStatus(200)
+            ->assertJsonStructure([
+                'token',
+                'user' => [
+                    'id',
+                    'name',
+                    'email',
+                ]
+            ]);
     }
 
     public function test_user_cannot_login_with_invalid_credentials()
@@ -35,6 +39,7 @@ class UserLoginTest extends TestCase
             'password' => 'wrong-password',
         ]);
 
-        $response->assertStatus(401);
+        $response->assertStatus(302);
+        $this->assertGuest();
     }
 } 

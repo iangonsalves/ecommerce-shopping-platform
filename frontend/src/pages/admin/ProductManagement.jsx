@@ -44,21 +44,32 @@ const ProductManagement = () => {
 
   const fetchProducts = async () => {
     try {
-      const response = await api.get('/admin/products');
-      setProducts(response.data);
-      setError('');
+      const response = await api.get('/admin/product-management');
+      console.log('Products API Response:', response);
+      if (response.data && response.data.data) {
+        setProducts(response.data.data);
+        setError('');
+      } else {
+        console.error('Unexpected API response structure:', response);
+        setError('Invalid response format from server');
+      }
     } catch (error) {
-      console.error('Error fetching products:', error);
+      console.error('Error fetching products:', error.response || error);
       setError('Failed to fetch products. Please try again.');
     }
   };
 
   const fetchCategories = async () => {
     try {
-      const response = await api.get('/admin/categories');
-      setCategories(response.data);
+      const response = await api.get('/admin/category-management');
+      console.log('Categories API Response:', response);
+      if (response.data && response.data.data) {
+        setCategories(response.data.data);
+      } else {
+        console.error('Unexpected categories API response structure:', response);
+      }
     } catch (error) {
-      console.error('Error fetching categories:', error);
+      console.error('Error fetching categories:', error.response || error);
     }
   };
 
@@ -110,9 +121,9 @@ const ProductManagement = () => {
     e.preventDefault();
     try {
       if (selectedProduct) {
-        await api.put(`/admin/products/${selectedProduct.id}`, formData);
+        await api.put(`/admin/product-management/${selectedProduct.id}`, formData);
       } else {
-        await api.post('/admin/products', formData);
+        await api.post('/admin/product-management', formData);
       }
       handleClose();
       fetchProducts();
@@ -125,7 +136,7 @@ const ProductManagement = () => {
   const handleDelete = async (id) => {
     if (window.confirm('Are you sure you want to delete this product?')) {
       try {
-        await api.delete(`/admin/products/${id}`);
+        await api.delete(`/admin/product-management/${id}`);
         fetchProducts();
       } catch (error) {
         console.error('Error deleting product:', error);
@@ -240,6 +251,7 @@ const ProductManagement = () => {
                 value={formData.category_id}
                 onChange={handleChange}
                 required
+                label="Category"
               >
                 {categories.map((category) => (
                   <MenuItem key={category.id} value={category.id}>
