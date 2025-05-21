@@ -10,7 +10,9 @@ class ProductController extends Controller
 {
     public function index()
     {
-        return response()->json(Product::with('category')->get());
+        return response()->json([
+            'data' => Product::with('category')->get()
+        ]);
     }
 
     public function store(Request $request)
@@ -25,7 +27,7 @@ class ProductController extends Controller
         ]);
 
         $product = Product::create($validated);
-        return response()->json($product, 201);
+        return response()->json(['data' => $product], 201);
     }
 
     public function update(Request $request, Product $product)
@@ -40,7 +42,7 @@ class ProductController extends Controller
         ]);
 
         $product->update($validated);
-        return response()->json($product);
+        return response()->json(['data' => $product]);
     }
 
     public function destroy(Product $product)

@@ -38,7 +38,7 @@ const OrderManagement = () => {
 
   const fetchOrders = async () => {
     try {
-      const response = await api.get('/admin/orders');
+      const response = await api.get('/admin/order-management');
       setOrders(response.data);
       setError('');
     } catch (error) {
@@ -65,7 +65,7 @@ const OrderManagement = () => {
   const handleStatusChange = async (orderId, newStatus) => {
     setStatusUpdateLoading(true);
     try {
-      await api.put(`/admin/orders/${orderId}/status`, {
+      await api.put(`/admin/order-management/${orderId}/status`, {
         status: newStatus
       });
       fetchOrders();

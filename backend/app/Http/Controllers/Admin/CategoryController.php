@@ -11,7 +11,9 @@ class CategoryController extends Controller
 {
     public function index()
     {
-        return response()->json(Category::withCount('products')->get());
+        return response()->json([
+            'data' => Category::withCount('products')->get()
+        ]);
     }
 
     public function store(Request $request)

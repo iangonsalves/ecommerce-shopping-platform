@@ -34,11 +34,11 @@ const AdminLayout = () => {
 
   const menuItems = [
     { text: 'Dashboard', icon: <DashboardIcon />, path: '/admin' },
-    { text: 'Products', icon: <ShoppingBagIcon />, path: '/admin/products' },
-    { text: 'Categories', icon: <CategoryIcon />, path: '/admin/categories' },
-    { text: 'Orders', icon: <ReceiptIcon />, path: '/admin/orders' },
+    { text: 'Products', icon: <ShoppingBagIcon />, path: '/admin/product-management' },
+    { text: 'Categories', icon: <CategoryIcon />, path: '/admin/category-management' },
+    { text: 'Orders', icon: <ReceiptIcon />, path: '/admin/order-management' },
     { text: 'Users', icon: <PeopleIcon />, path: '/admin/users' },
-    { text: 'Reviews', icon: <RateReviewIcon />, path: '/admin/reviews' },
+    { text: 'Reviews', icon: <RateReviewIcon />, path: '/admin/review-management' },
   ];
 
   const drawer = (

@@ -31,7 +31,7 @@ const ReviewManagement = () => {
 
   const fetchReviews = async () => {
     try {
-      const response = await api.get('/admin/reviews');
+      const response = await api.get('/admin/review-management');
       setReviews(response.data);
       setError('');
     } catch (error) {
@@ -57,7 +57,7 @@ const ReviewManagement = () => {
   const handleDelete = async (reviewId) => {
     if (window.confirm('Are you sure you want to delete this review?')) {
       try {
-        await api.delete(`/admin/reviews/${reviewId}`);
+        await api.delete(`/admin/review-management/${reviewId}`);
         fetchReviews();
       } catch (error) {
         console.error('Error deleting review:', error);

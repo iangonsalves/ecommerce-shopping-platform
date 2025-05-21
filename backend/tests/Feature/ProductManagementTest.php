@@ -3,72 +3,139 @@
 namespace Tests\Feature;
 
 use Tests\TestCase;
+use App\Models\User;
+use App\Models\Product;
+use App\Models\Category;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\WithFaker;
 
 class ProductManagementTest extends TestCase
 {
-    use RefreshDatabase;
+    use RefreshDatabase, WithFaker;
 
+    protected $admin;
+    protected $category;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        
+        $this->admin = User::factory()->create([
+            'role' => 'admin'
+        ]);
+
+        $this->category = Category::factory()->create();
+    }
+
+    /** @test */
     public function test_admin_can_add_product()
     {
-        // Assuming you have a way to authenticate as an admin
-        $this->actingAs($this->createAdminUser());
+        $this->actingAs($this->admin);
 
-        $response = $this->post('/api/products', [
+        $productData = [
             'name' => 'Test Product',
-            'description' => 'This is a test product.',
+            'description' => 'Test Description',
             'price' => 99.99,
-            'category_id' => 1,
-        ]);
+            'stock' => 100,
+            'category_id' => $this->category->id
+        ];
 
-        $response->assertStatus(201);
+        $response = $this->postJson('/api/admin/product-management', $productData);
+
+        $response->assertStatus(201)
+            ->assertJsonStructure([
+                'data' => [
+                    'id',
+                    'name',
+                    'description',
+                    'price',
+                    'stock',
+                    'category_id',
+                    'created_at',
+                    'updated_at'
+                ]
+            ]);
+
         $this->assertDatabaseHas('products', [
             'name' => 'Test Product',
+            'price' => 99.99
         ]);
     }
 
+    /** @test */
     public function test_admin_can_update_product()
     {
-        $this->actingAs($this->createAdminUser());
+        $this->actingAs($this->admin);
 
-        $product = $this->createProduct();
-
-        $response = $this->put("/api/products/{$product->id}", [
-            'name' => 'Updated Product',
-            'description' => 'This is an updated product.',
-            'price' => 149.99,
-            'category_id' => 1,
+        $product = Product::factory()->create([
+            'category_id' => $this->category->id
         ]);
 
-        $response->assertStatus(200);
-        $this->assertDatabaseHas('products', [
+        $updateData = [
             'name' => 'Updated Product',
+            'description' => 'Updated Description',
+            'price' => 149.99,
+            'stock' => 50,
+            'category_id' => $this->category->id
+        ];
+
+        $response = $this->putJson("/api/admin/product-management/{$product->id}", $updateData);
+
+        $response->assertStatus(200)
+            ->assertJsonStructure([
+                'data' => [
+                    'id',
+                    'name',
+                    'description',
+                    'price',
+                    'stock',
+                    'category_id',
+                    'created_at',
+                    'updated_at'
+                ]
+            ]);
+
+        $this->assertDatabaseHas('products', [
+            'id' => $product->id,
+            'name' => 'Updated Product',
+            'price' => 149.99
         ]);
     }
 
+    /** @test */
     public function test_admin_can_delete_product()
     {
-        $this->actingAs($this->createAdminUser());
+        $this->actingAs($this->admin);
 
-        $product = $this->createProduct();
+        $product = Product::factory()->create([
+            'category_id' => $this->category->id
+        ]);
 
-        $response = $this->delete("/api/products/{$product->id}");
+        $response = $this->deleteJson("/api/admin/product-management/{$product->id}");
 
-        $response->assertStatus(200);
+        $response->assertStatus(204);
+
         $this->assertDatabaseMissing('products', [
-            'id' => $product->id,
+            'id' => $product->id
         ]);
     }
 
-    private function createAdminUser()
+    /** @test */
+    public function test_cannot_create_product_with_negative_price()
     {
-        // Create and return an admin user
-        return \App\Models\User::factory()->create(['role' => 'admin']);
-    }
+        $this->actingAs($this->admin);
 
-    private function createProduct()
-    {
-        // Create and return a product
-        return \App\Models\Product::factory()->create();
+        $productData = [
+            'name' => 'Invalid Product',
+            'description' => 'Test Description',
+            'price' => -99.99,
+            'stock' => 100,
+            'category_id' => $this->category->id
+        ];
+
+        $response = $this->postJson('/api/admin/product-management', $productData);
+
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors(['price']);
     }
 } 

@@ -13,7 +13,9 @@ class CategoryController extends Controller
      */
     public function index()
     {
-        return response()->json(Category::with('products')->get());
+        return response()->json([
+            'data' => Category::with('products')->get()
+        ]);
     }
 
     /**
@@ -29,7 +31,7 @@ class CategoryController extends Controller
         $validated['slug'] = Str::slug($validated['name']);
 
         $category = Category::create($validated);
-        return response()->json($category, 201);
+        return response()->json(['data' => $category], 201);
     }
 
     /**
@@ -37,7 +39,9 @@ class CategoryController extends Controller
      */
     public function show(Category $category)
     {
-        return response()->json($category->load('products'));
+        return response()->json([
+            'data' => $category->load('products')
+        ]);
     }
 
     /**
@@ -55,7 +59,7 @@ class CategoryController extends Controller
         }
 
         $category->update($validated);
-        return response()->json($category);
+        return response()->json(['data' => $category]);
     }
 
     /**
