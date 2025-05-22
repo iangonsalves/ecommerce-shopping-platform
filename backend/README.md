@@ -1,6 +1,6 @@
 # E-commerce Platform Backend
 
-Laravel-based RESTful API backend for the e-commerce platform.
+Laravel-based REST API backend for the e-commerce platform.
 
 ## Features
 
@@ -162,7 +162,7 @@ POST   /api/checkout     - Place new order
 
 ## Development Setup
 
-1. Install dependencies:
+Install dependencies:
 ```bash
 composer install
 ```
@@ -170,25 +170,16 @@ composer install
 2. Configure environment:
 ```bash
 cp .env.example .env
-php artisan key:generate
+# Configure database credentials
+# Configure Stripe keys
 ```
 
-3. Configure database in .env:
-```
-DB_CONNECTION=mysql
-DB_HOST=127.0.0.1
-DB_PORT=3306
-DB_DATABASE=ecommerce
-DB_USERNAME=root
-DB_PASSWORD=
-```
-
-4. Run migrations and seeders:
+### Database Setup
 ```bash
 php artisan migrate:fresh --seed
 ```
 
-5. Start development server:
+### Start Development Server
 ```bash
 php artisan serve
 ```
