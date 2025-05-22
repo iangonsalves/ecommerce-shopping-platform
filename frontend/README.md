@@ -1,6 +1,6 @@
 # E-commerce Platform Frontend
 
-React-based frontend for the e-commerce platform, built with Material-UI.
+React-based frontend application for the e-commerce platform.
 
 ## Features
 
@@ -63,7 +63,13 @@ src/
 npm install
 ```
 
-2. Start development server:
+2. Configure environment:
+```bash
+cp .env.example .env
+# Set API_URL=http://localhost:8000/api
+```
+
+3. Start development server:
 ```bash
 npm run dev
 ```

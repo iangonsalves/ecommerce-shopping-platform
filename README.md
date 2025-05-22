@@ -131,3 +131,15 @@ npm run dev
 - PUT `/api/cart/items/{id}` - Update cart item quantity
 - DELETE `/api/cart/items/{id}` - Remove item from cart
 
+## Testing
+
+### Backend Tests
+```bash
+cd backend
+php artisan test
+```
+
+Available test suites:
+- Feature Tests: API endpoints and integration tests
+- Unit Tests: Business logic and model tests
+
