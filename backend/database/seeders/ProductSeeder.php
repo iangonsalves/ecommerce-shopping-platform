@@ -30,7 +30,7 @@ class ProductSeeder extends Seeder
                         'description' => 'Official Manchester United home jersey for the 2023/2024 season.',
                         'price' => 90.00,
                         'stock' => 50,
-                        'image' => 'https://placehold.co/400x300?text=MU+Home',
+                        'image' => 'images/products/manchester_united_home_23:24.jpg',
                         'size_variations' => json_encode(['S', 'M', 'L', 'XL', 'XXL']),
                     ],
                     [
@@ -38,7 +38,7 @@ class ProductSeeder extends Seeder
                         'description' => 'Official Manchester United away jersey for the 2023/2024 season.',
                         'price' => 85.00,
                         'stock' => 40,
-                        'image' => 'https://placehold.co/400x300?text=MU+Away',
+                        'image' => 'images/products/manchester_united_away_23:24.jpg',
                         'size_variations' => json_encode(['S', 'M', 'L', 'XL']),
                     ],
                 ]
