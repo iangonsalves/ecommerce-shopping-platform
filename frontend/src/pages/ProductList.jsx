@@ -103,7 +103,11 @@ const ProductList = () => {
               <CardMedia
                 component="img"
                 height="200"
-                image="https://placehold.co/200x200/CCCCCC/666666?text=Product+Image"
+                image={product.image ? 
+                  (product.image.startsWith('http://') || product.image.startsWith('https://') ? 
+                    product.image : 
+                    `${import.meta.env.VITE_API_BASE_URL.replace('/api', '')}/${product.image}`)
+                  : 'https://placehold.co/400x300/CCCCCC/666666?text=Product+Image'}
                 alt={product.name}
                 sx={{ objectFit: 'contain', p: 2 }}
               />

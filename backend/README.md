@@ -60,6 +60,10 @@ app/
     └── CartService.php
 ```
 
+## Image Handling (Local Storage)
+
+For local development, product images are stored in the `backend/public/images` directory. These images are served directly from the backend's root URL. Ensure the product data in the database (e.g., via seeders) uses paths relative to the `public` directory (e.g., `images/products/my_jersey.jpg`).
+
 ## Database Structure
 
 ### Users

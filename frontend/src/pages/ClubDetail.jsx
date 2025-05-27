@@ -102,10 +102,15 @@ const ClubDetail = () => {
             <Grid item xs={12} sm={6} md={4} key={product.id}>
               <Card>
                 <CardActionArea component={Link} to={`/products/${product.id}`}>
+                  {console.log('Image prop for CardMedia:', product.image || product.image_url || 'https://placehold.co/400x200/CCCCCC/666666?text=Product+Image')}
                   <CardMedia
                     component="img"
                     height="140"
-                    image={product.image || product.image_url || 'https://placehold.co/400x200/CCCCCC/666666?text=Product+Image'}
+                    image={product.image || product.image_url ? 
+                      ((product.image || product.image_url).startsWith('http://') || (product.image || product.image_url).startsWith('https://') ? 
+                        (product.image || product.image_url) : 
+                        `${import.meta.env.VITE_API_BASE_URL.replace('/api', '')}/${product.image || product.image_url}`)
+                      : 'https://placehold.co/400x300/CCCCCC/666666?text=Product+Image'}
                     alt={product.name}
                   />
                   <CardContent>

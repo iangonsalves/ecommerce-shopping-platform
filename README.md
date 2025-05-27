@@ -39,7 +39,7 @@ A specialized e-commerce platform for football/soccer jerseys built with Laravel
 └── frontend/               # React frontend
 ```
 
-See individual README files in each directory for detailed documentation.
+See individual README files in each directory for detailed documentation on setup, API endpoints, and project structure.
 
 ## Getting Started
 
@@ -77,6 +77,8 @@ php artisan migrate:fresh --seed
 php artisan serve
 ```
 
+For detailed instructions on backend setup, including database configuration and image handling, refer to the `backend/README.md` file.
+
 ### Frontend Setup
 1. Navigate to the frontend directory:
 ```bash
@@ -92,6 +94,8 @@ npm install
 ```bash
 npm run dev
 ```
+
+For detailed instructions on frontend setup, including environment variable configuration for API and image fetching, refer to the `frontend/README.md` file.
 
 ## API Endpoints
 
