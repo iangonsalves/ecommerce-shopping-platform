@@ -1,0 +1,86 @@
+# Use an official PHP image with FPM and Alpine Linux for a smaller image size
+FROM php:8.2-fpm-alpine
+
+# Install common system dependencies and PHP extensions
+# gd is for image manipulation, necessary if you process images
+# pdo_mysql is for connecting to MySQL (even if using Postgres on Render,
+# having mysql extension might be needed by some packages or logic)
+# pdo_pgsql is for connecting to PostgreSQL
+# zip for composer and other archive needs
+# nginx as the web server
+RUN apk add --no-cache \
+    nginx \
+    supervisor \
+    curl \
+    libpng \
+    libjpeg \
+    libwebp \
+    freetype \
+    libzip \
+    oniguruma \
+    php82-common \
+    php82-pdo \
+    php82-mysqli \
+    php82-pdo_mysql \
+    php82-pdo_pgsql \
+    php82-gd \
+    php82-zip \
+    php82-curl \
+    php82-dom \
+    php82-xml \
+    php82-simplexml \
+    php82-json \
+    php82-mbstring \
+    php82-tokenizer \
+    php82-session \
+    php82-xmlreader \
+    php82-ctype \
+    php82-fileinfo \
+    php82-openssl \
+    && docker-php-ext-install -j$(nproc) \
+        gd \
+        pdo_mysql \
+        pdo_pgsql \
+        zip \
+        curl \
+        dom \
+        mbstring \
+        tokenizer \
+        session \
+        xml \
+        xmlreader \
+        ctype \
+        fileinfo \
+        openssl
+
+# Copy Composer executable
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+
+# Set the working directory inside the container
+WORKDIR /app
+
+# Copy the Laravel application code from the backend directory
+# Since Render is building from the 'backend' root directory, '.' is correct here
+COPY . /app
+
+# Install PHP dependencies
+RUN composer install --no-dev --optimize-autoloader
+
+# Configure Nginx
+COPY ./nginx.conf /etc/nginx/http.d/default.conf
+
+# Copy supervisor configuration
+COPY ./supervisord.conf /etc/supervisord/conf.d/supervisord.conf
+
+# Adjust permissions
+RUN chown -R www-data:www-data /app/storage \
+    && chown -R www-data:www-data /app/bootstrap/cache \
+    && chmod -R 775 /app/storage \
+    && chmod -R 775 /app/bootstrap/cache \
+    && chmod -R 755 /app
+
+# Expose port 80 (Nginx default)
+EXPOSE 80
+
+# Start supervisord (which will manage nginx and php-fpm)
+CMD ["/usr/bin/supervisord", "-c", "/etc/supervisord/supervisord.conf"]
