@@ -140,7 +140,11 @@ const ProductDetail = () => {
         <Grid container spacing={4}>
           <Grid item xs={12} md={6}>
             <img
-              src={product.image || product.image_url || 'https://via.placeholder.com/400'}
+              src={product.image || product.image_url ? 
+                ((product.image || product.image_url).startsWith('http://') || (product.image || product.image_url).startsWith('https://') ? 
+                  (product.image || product.image_url) : 
+                  `${import.meta.env.VITE_API_BASE_URL.replace('/api', '')}/${product.image || product.image_url}`)
+                : 'https://placehold.co/400x300/CCCCCC/666666?text=Product+Image'}
               alt={product.name}
               style={{ width: '100%', height: 'auto', maxHeight: '400px', objectFit: 'contain' }}
             />

@@ -69,6 +69,8 @@ cp .env.example .env
 # Set API_URL=http://localhost:8000/api
 ```
 
+Create a `.env` file in the `frontend`. Set the `VITE_API_BASE_URL` variable to the base URL of your backend application (e.g., `http://localhost:8000`). This URL is used for making API requests and fetching static assets like images from the backend's `public` directory.
+
 3. Start development server:
 ```bash
 npm run dev
