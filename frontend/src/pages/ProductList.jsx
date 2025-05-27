@@ -21,14 +21,35 @@ const ProductList = () => {
   const [error, setError] = useState('');
   const { addToCart, loading: cartLoading, error: cartError, refreshCart } = useCart();
 
+  const cleanImageUrl = (url) => {
+    if (!url) return null;
+    // Remove any escaped forward slashes and ensure proper URL format
+    const cleaned = url.replace(/\\/g, '');
+    console.log('Original URL:', url);
+    console.log('Cleaned URL:', cleaned);
+    return cleaned;
+  };
+
   useEffect(() => {
     const fetchProducts = async () => {
       try {
         const response = await api.get('/products');
-        setProducts(response.data);
+        console.log('Raw API Response:', response.data);
+        // Clean image URLs in the response
+        const cleanedProducts = response.data.map(product => {
+          console.log('Product image before cleaning:', product.image);
+          console.log('Product image_url before cleaning:', product.image_url);
+          return {
+            ...product,
+            image: cleanImageUrl(product.image),
+            image_url: cleanImageUrl(product.image_url)
+          };
+        });
+        console.log('Products after cleaning:', cleanedProducts);
+        setProducts(cleanedProducts);
       } catch (error) {
         setError('Error fetching products');
-        console.error('Error:', error);
+        console.error('Error fetching products:', error);
       } finally {
         setLoading(false);
       }
@@ -36,6 +57,8 @@ const ProductList = () => {
 
     fetchProducts();
   }, []);
+
+  console.log('Products state:', products);
 
   const handleAddToCart = async (productId) => {
     const success = await addToCart(productId, 1);
@@ -72,6 +95,7 @@ const ProductList = () => {
         </Alert>
       )}
 
+      {console.log('Mapping products:', products)}
       <Grid container spacing={4}>
         {products.map((product) => (
           <Grid item key={product.id} xs={12} sm={6} md={4}>
@@ -79,7 +103,7 @@ const ProductList = () => {
               <CardMedia
                 component="img"
                 height="200"
-                image={product.image || product.image_url || 'https://via.placeholder.com/200'}
+                image="https://placehold.co/200x200/CCCCCC/666666?text=Product+Image"
                 alt={product.name}
                 sx={{ objectFit: 'contain', p: 2 }}
               />
@@ -88,7 +112,7 @@ const ProductList = () => {
                   {product.name}
                 </Typography>
                 <Typography variant="h6" color="primary" gutterBottom>
-                  ${product.price.toFixed(2)}
+                  ${Number(product.price).toFixed(2)}
                 </Typography>
                 <Typography variant="body2" color="text.secondary" paragraph>
                   {product.description}

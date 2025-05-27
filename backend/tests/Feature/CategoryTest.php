@@ -37,11 +37,13 @@ class CategoryTest extends TestCase
 
         $response->assertStatus(201)
             ->assertJsonStructure([
-                'id',
-                'name',
-                'description',
-                'created_at',
-                'updated_at'
+                'data' => [
+                    'id',
+                    'name',
+                    'description',
+                    'created_at',
+                    'updated_at'
+                ]
             ]);
 
         $this->assertDatabaseHas('categories', [
@@ -65,11 +67,13 @@ class CategoryTest extends TestCase
 
         $response->assertStatus(200)
             ->assertJsonStructure([
-                'id',
-                'name',
-                'description',
-                'created_at',
-                'updated_at'
+                'data' => [
+                    'id',
+                    'name',
+                    'description',
+                    'created_at',
+                    'updated_at'
+                ]
             ]);
 
         $this->assertDatabaseHas('categories', [

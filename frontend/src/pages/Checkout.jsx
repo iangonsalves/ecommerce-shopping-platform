@@ -388,13 +388,15 @@ const CheckoutContent = () => {
                           style={{ width: '100%', height: 'auto' }}
                         />
                       </Grid>
-                      <Grid item xs={6}>
-                        <Typography variant="subtitle1">
-                          {item.product.name}
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary">
-                          Quantity: {item.quantity}
-                        </Typography>
+                      <Grid item xs={8}>
+                        <Typography gutterBottom>{item.product?.name}</Typography>
+                        {/* Display selected size if available */}
+                        {item.options?.size && (
+                          <Typography variant="body2" color="text.secondary">
+                            Size: {item.options.size}
+                          </Typography>
+                        )}
+                        <Typography variant="body2" color="text.secondary">Quantity: {item.quantity}</Typography>
                       </Grid>
                       <Grid item xs={3}>
                         <Typography variant="subtitle1">

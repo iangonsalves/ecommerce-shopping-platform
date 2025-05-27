@@ -1,37 +1,22 @@
-# E-commerce Shopping Platform
+# Football Jersey E-commerce Platform
 
-A modern, full-stack e-commerce platform built with Laravel (Backend) and React (Frontend).
+A specialized e-commerce platform for football/soccer jerseys built with Laravel and React.
 
 ## Features
 
-### Authentication & User Management
-- User registration and login
-- JWT-based authentication
-- Protected routes
-- User profile management
+### Jersey Management
+- Browse by clubs (categories)
+- Filter by season and kit type (home/away/third)
+- Size variations (S, M, L, XL, XXL)
+- High-quality jersey images
+- Detailed product descriptions
 
-### Product Management
-- Product listing with details
-- Product categories
-- Product search and filtering
-- Detailed product views
-
-### Shopping Cart
-- Real-time cart management
-- Add/remove items
-- Update quantities
-- Persistent cart across sessions
-
-### Order Management
-- Order placement and checkout
-- Order history tracking
-- Order status updates
-- Detailed order views
-
-### Categories
-- Browse products by category
-- Category listing page
-- Category detail view
+### Shopping Experience
+- Club-based navigation
+- Size guide
+- Season filtering
+- Kit type selection
+- Stock management by size
 
 ## Technical Stack
 

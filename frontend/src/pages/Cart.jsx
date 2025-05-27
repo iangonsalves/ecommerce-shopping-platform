@@ -191,6 +191,12 @@ const Cart = () => {
                   <Typography variant="body2" color="text.secondary">
                     ${item.price.toFixed(2)}
                   </Typography>
+                  {/* Display selected size if available */}
+                  {item.options?.size && (
+                    <Typography variant="body2" color="text.secondary">
+                      Size: {item.options.size}
+                    </Typography>
+                  )}
                 </Grid>
                 <Grid item xs={12} sm={3}>
                   <TextField

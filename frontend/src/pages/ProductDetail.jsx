@@ -17,7 +17,11 @@ import {
   Dialog,
   DialogTitle,
   DialogContent,
-  DialogActions
+  DialogActions,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel
 } from '@mui/material';
 import api from '../services/api';
 import { useCart } from '../context/CartContext';
@@ -30,6 +34,7 @@ const ProductDetail = () => {
   const [product, setProduct] = useState(null);
   const [reviews, setReviews] = useState([]);
   const [quantity, setQuantity] = useState(1);
+  const [selectedSize, setSelectedSize] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
@@ -47,8 +52,26 @@ const ProductDetail = () => {
           api.get(`/products/${id}`),
           api.get(`/products/${id}/reviews`)
         ]);
-        setProduct(productRes.data);
+        
+        const fetchedProduct = productRes.data;
+        
+        // Parse size_variations if it's a string
+        if (typeof fetchedProduct.size_variations === 'string') {
+            try {
+                fetchedProduct.size_variations = JSON.parse(fetchedProduct.size_variations);
+            } catch (parseError) {
+                console.error('Failed to parse size_variations JSON string:', parseError);
+                fetchedProduct.size_variations = []; // Set to empty array if parsing fails
+            }
+        }
+
+        setProduct(fetchedProduct);
         setReviews(reviewsRes.data);
+
+        if (fetchedProduct.size_variations && fetchedProduct.size_variations.length > 0) {
+          setSelectedSize(fetchedProduct.size_variations[0]);
+        }
+
       } catch (error) {
         setError('Error fetching product details');
         console.error('Error:', error);
@@ -69,7 +92,7 @@ const ProductDetail = () => {
 
   const handleAddToCart = async () => {
     setSuccessMessage('');
-    const success = await addToCart(product.id, quantity);
+    const success = await addToCart(product.id, quantity, selectedSize);
     if (success) {
       setSuccessMessage('Item added to cart successfully!');
       setQuantity(1);
@@ -151,6 +174,25 @@ const ProductDetail = () => {
                 {cartError}
               </Alert>
             )}
+            {/* Conditionally render size selection only if variations exist and are an array */}
+            {product.size_variations && Array.isArray(product.size_variations) && product.size_variations.length > 0 && (
+              <FormControl sx={{ mt: 2, minWidth: 120 }}>
+                <InputLabel id="size-select-label">Size</InputLabel>
+                <Select
+                  labelId="size-select-label"
+                  id="size-select"
+                  value={selectedSize}
+                  label="Size"
+                  onChange={(e) => setSelectedSize(e.target.value)}
+                >
+                  {product.size_variations.map((size) => (
+                    <MenuItem key={size} value={size}>
+                      {size}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            )}
             <Box sx={{ mt: 2, display: 'flex', gap: 2, alignItems: 'center' }}>
               <TextField
                 type="number"
@@ -164,7 +206,7 @@ const ProductDetail = () => {
                 variant="contained"
                 color="primary"
                 onClick={handleAddToCart}
-                disabled={cartLoading || quantity < 1 || quantity > product.stock}
+                disabled={cartLoading || quantity < 1 || quantity > product.stock || (product.size_variations && !selectedSize)}
               >
                 {cartLoading ? 'Adding...' : 'Add to Cart'}
               </Button>

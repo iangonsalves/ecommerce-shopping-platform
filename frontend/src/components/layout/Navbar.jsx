@@ -51,7 +51,7 @@ const Navbar = () => {
           <Button
             color="inherit"
             component={RouterLink}
-            to="/categories"
+            to="/leagues"
           >
             Categories
           </Button>

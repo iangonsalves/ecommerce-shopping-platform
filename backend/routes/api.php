@@ -33,9 +33,16 @@ Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::get('/products', [ProductController::class, 'index']);
 Route::get('/products/{product}', [ProductController::class, 'show']);
-Route::get('/categories', [CategoryController::class, 'index']);
-Route::get('/categories/{category}', [CategoryController::class, 'show']);
-Route::get('/products/{product}/reviews', [ReviewController::class, 'index']);
+
+// League and Club routes (replacing general category routes)
+Route::get('/leagues', [CategoryController::class, 'index']); // Lists all leagues
+Route::get('/leagues/{league}', [CategoryController::class, 'show']); // Show league details
+Route::get('/leagues/{league}/clubs', [CategoryController::class, 'getClubsByLeague']); // Get clubs in a league
+Route::get('/clubs/{club}', [CategoryController::class, 'show']); // Show club details
+
+// // Keep the old category routes for backward compatibility
+// Route::get('/categories', [CategoryController::class, 'index'])->name('categories.index');
+// Route::get('/categories/{category}', [CategoryController::class, 'show'])->name('categories.show');
 
 // Protected routes
 Route::middleware('auth:sanctum')->group(function () {
@@ -57,10 +64,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/checkout', [CheckoutController::class, 'placeOrder']);
     Route::post('/create-payment-intent', [PaymentController::class, 'createPaymentIntent']);
     
-    // Review routes
-    Route::post('/products/{product}/reviews', [ReviewController::class, 'store']);
-    Route::put('/products/{product}/reviews/{review}', [ReviewController::class, 'update']);
-    Route::delete('/products/{product}/reviews/{review}', [ReviewController::class, 'destroy']);
+     // Review routes
+     Route::get('/products/{product}/reviews', [ReviewController::class, 'index']);
+     Route::post('/products/{product}/reviews', [ReviewController::class, 'store']);
+     Route::put('/products/{product}/reviews/{review}', [ReviewController::class, 'update']);
+     Route::delete('/products/{product}/reviews/{review}', [ReviewController::class, 'destroy']);
 });
 
 // Admin Routes
@@ -93,4 +101,4 @@ Route::middleware(['auth:sanctum', 'admin'])->prefix('admin')->group(function ()
     Route::get('/review-management', [AdminReviewController::class, 'index']);
     Route::get('/review-management/{review}', [AdminReviewController::class, 'show']);
     Route::delete('/review-management/{review}', [AdminReviewController::class, 'destroy']);
-}); 
+});

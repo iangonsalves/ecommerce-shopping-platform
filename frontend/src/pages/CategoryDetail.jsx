@@ -19,26 +19,40 @@ import { useCart } from '../context/CartContext';
 
 const CategoryDetail = () => {
   const { id } = useParams();
-  const [category, setCategory] = useState(null);
+  const [league, setLeague] = useState(null);
+  const [clubs, setClubs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const { addToCart, loading: cartLoading } = useCart();
 
   useEffect(() => {
-    const fetchCategory = async () => {
+    const fetchLeagueAndClubs = async () => {
       try {
-        const response = await api.get(`/categories/${id}`);
-        setCategory(response.data.data);
+        // Fetch league details
+        const leagueResponse = await api.get(`/leagues/${id}`);
+        console.log('League Response:', leagueResponse.data);
+        // Handle both wrapped and unwrapped responses
+        const leagueData = leagueResponse.data.data || leagueResponse.data;
+        setLeague(leagueData);
+
+        // Fetch clubs in this league
+        const clubsResponse = await api.get(`/leagues/${id}/clubs`);
+        console.log('Clubs Response:', clubsResponse.data);
+        // Handle both wrapped and unwrapped responses
+        const clubsData = clubsResponse.data.data || clubsResponse.data;
+        // Ensure clubs is an array
+        setClubs(Array.isArray(clubsData) ? clubsData : []);
+
         setError('');
       } catch (error) {
-        console.error('Error fetching category:', error);
-        setError('Failed to load category');
+        console.error('Error fetching data:', error);
+        setError('Failed to load league data');
       } finally {
         setLoading(false);
       }
     };
 
-    fetchCategory();
+    fetchLeagueAndClubs();
   }, [id]);
 
   const handleAddToCart = async (productId) => {
@@ -68,64 +82,60 @@ const CategoryDetail = () => {
     );
   }
 
-  if (!category) {
+  if (!league) {
     return (
       <Container>
         <Alert severity="info" sx={{ mt: 2 }}>
-          Category not found
+          League not found
         </Alert>
       </Container>
     );
   }
 
   return (
-    <Container>
+    <Container maxWidth="lg" sx={{ mt: 4 }}>
       <Typography variant="h4" component="h1" gutterBottom>
-        {category.name}
+        {league.name}
       </Typography>
       
       <Typography variant="body1" paragraph>
-        {category.description}
+        {league.description}
       </Typography>
 
-      <Grid container spacing={3}>
-        {category.products && category.products.map((product) => (
-          <Grid item xs={12} sm={6} md={4} key={product.id}>
-            <Card>
-              <CardActionArea component={Link} to={`/products/${product.id}`}>
-                <CardMedia
-                  component="img"
-                  height="140"
-                  image={product.image || product.image_url || 'https://via.placeholder.com/140'}
-                  alt={product.name}
-                />
-                <CardContent>
-                  <Typography gutterBottom variant="h5" component="div">
-                    {product.name}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    {product.description}
-                  </Typography>
-                  <Typography variant="h6" color="primary">
-                    ${product.price.toFixed(2)}
-                  </Typography>
-                </CardContent>
-              </CardActionArea>
-              <Box sx={{ p: 2, pt: 0 }}>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  fullWidth
-                  onClick={() => handleAddToCart(product.id)}
-                  disabled={cartLoading}
-                >
-                  {cartLoading ? 'Adding...' : 'Add to Cart'}
-                </Button>
-              </Box>
-            </Card>
+      {/* Display clubs in this league */}
+      <Box sx={{ mt: 4 }}>
+        <Typography variant="h5" gutterBottom>
+          Teams in this League:
+        </Typography>
+        {clubs.length === 0 ? (
+          <Alert severity="info">No teams found in this league</Alert>
+        ) : (
+          <Grid container spacing={2}>
+            {clubs.map((club) => (
+              <Grid item xs={12} sm={6} md={4} key={club.id}>
+                <Card>
+                  <CardActionArea component={Link} to={`/clubs/${club.id}`}>
+                    <CardMedia
+                      component="img"
+                      height="140"
+                      image={club.image || club.image_url || 'https://placehold.co/400x200/CCCCCC/666666?text=Club+Image'}
+                      alt={club.name}
+                    />
+                    <CardContent>
+                      <Typography variant="h6" component="div">
+                        {club.name}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        {club.description || 'View club jerseys'}
+                      </Typography>
+                    </CardContent>
+                  </CardActionArea>
+                </Card>
+              </Grid>
+            ))}
           </Grid>
-        ))}
-      </Grid>
+        )}
+      </Box>
     </Container>
   );
 };

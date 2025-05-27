@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use App\Models\Category;
 use Illuminate\Support\Str;
@@ -15,36 +14,56 @@ class CategorySeeder extends Seeder
     public function run(): void
     {
         $categories = [
+            // Premier League
             [
-                'name' => 'Electronics',
-                'description' => 'Electronic devices and accessories',
+                'name' => 'Premier League',
+                'description' => 'English Premier League Teams',
+                'clubs' => [
+                    'Manchester United',
+                    // Add other Premier League clubs here ONLY if you have seeded products for them in ProductSeeder
+                ]
             ],
+            // La Liga
             [
-                'name' => 'Computers',
-                'description' => 'Laptops, desktops, and computer accessories',
+                'name' => 'La Liga',
+                'description' => 'Spanish La Liga Teams',
+                'clubs' => [
+                    'Barcelona',
+                    'Real Madrid',
+                    // Add other La Liga clubs here ONLY if you have seeded products for them in ProductSeeder
+                ]
             ],
+            // Bundesliga
             [
-                'name' => 'Mobile Phones',
-                'description' => 'Smartphones and mobile accessories',
-            ],
-            [
-                'name' => 'Audio',
-                'description' => 'Headphones, speakers, and audio equipment',
-            ],
-            [
-                'name' => 'Wearables',
-                'description' => 'Smartwatches, fitness trackers, and other wearable devices',
-            ],
+                'name' => 'Bundesliga',
+                'description' => 'German Bundesliga Teams',
+                'clubs' => [
+                     // Add Bundesliga clubs here ONLY if you have seeded products for them in ProductSeeder
+                ]
+            ]
+            // Add more leagues and clubs here ONLY if you have seeded products for the clubs you include
         ];
 
         foreach ($categories as $category) {
-            Category::firstOrCreate(
+            $leagueCategory = Category::firstOrCreate(
                 ['slug' => Str::slug($category['name'])],
                 [
                     'name' => $category['name'],
-                    'description' => $category['description'],
+                    'description' => $category['description']
                 ]
             );
+
+            // Create club categories as children of the league
+            foreach ($category['clubs'] as $clubName) {
+                Category::firstOrCreate(
+                    ['slug' => Str::slug($clubName)],
+                    [
+                        'name' => $clubName,
+                        'description' => "$clubName Official Football Jerseys",
+                        'parent_id' => $leagueCategory->id
+                    ]
+                );
+            }
         }
     }
 }

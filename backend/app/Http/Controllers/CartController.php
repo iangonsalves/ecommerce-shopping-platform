@@ -30,7 +30,8 @@ class CartController extends Controller
     {
         $request->validate([
             'product_id' => 'required|exists:products,id',
-            'quantity' => 'required|integer|min:1'
+            'quantity' => 'required|integer|min:1',
+            'options' => 'nullable|json',
         ]);
 
         $cart = Cart::firstOrCreate(
@@ -43,11 +44,13 @@ class CartController extends Controller
         $cartItem = CartItem::updateOrCreate(
             [
                 'cart_id' => $cart->id,
-                'product_id' => $product->id
+                'product_id' => $product->id,
+                'options' => $request->input('options'),
             ],
             [
                 'quantity' => $request->quantity,
-                'price' => $product->price
+                'price' => $product->price,
+                'options' => $request->input('options'),
             ]
         );
 

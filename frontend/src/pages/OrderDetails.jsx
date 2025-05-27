@@ -147,7 +147,18 @@ const OrderDetails = () => {
             <React.Fragment key={item.id}>
               <ListItem>
                 <ListItemText
-                  primary={item.product_name}
+                  primary={
+                    <React.Fragment>
+                      <Typography component="span" variant="body1" color="text.primary">
+                        {item.product_name}
+                      </Typography>
+                      {item.options?.size && (
+                        <Typography component="span" variant="body2" color="text.secondary" sx={{ ml: 1 }}>
+                          Size: {item.options.size}
+                        </Typography>
+                      )}
+                    </React.Fragment>
+                  }
                   secondary={`Quantity: ${item.quantity} | Price: ${formatCurrency(item.price)}`}
                 />
                 <Typography variant="body2">
