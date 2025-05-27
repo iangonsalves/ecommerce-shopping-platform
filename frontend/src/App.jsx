@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import theme from './theme';
+import { Box } from '@mui/material';
 
 // Layout components
 import Navbar from './components/layout/Navbar';
@@ -23,6 +24,7 @@ import Profile from './pages/Profile';
 import CategoryList from './pages/CategoryList';
 import CategoryDetail from './pages/CategoryDetail';
 import NotFound from './pages/NotFound';
+import ClubDetail from './pages/ClubDetail';
 
 // Context providers
 import { AuthProvider } from './context/AuthContext';
@@ -48,15 +50,19 @@ function App() {
           <Router>
             <div className="app" style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
               <Navbar />
-              <main className="main-content" style={{ flex: 1, padding: '20px 0' }}>
+              <main 
+                className="main-content" 
+                style={{ flex: 1, backgroundColor: '#fff' }}
+              >
                 <Routes>
                   <Route path="/" element={<Home />} />
                   <Route path="/login" element={<Login />} />
                   <Route path="/register" element={<Register />} />
                   <Route path="/products" element={<ProductList />} />
                   <Route path="/products/:id" element={<ProductDetail />} />
-                  <Route path="/categories" element={<CategoryList />} />
-                  <Route path="/categories/:id" element={<CategoryDetail />} />
+                  <Route path="/leagues" element={<CategoryList />} />
+                  <Route path="/leagues/:id" element={<CategoryDetail />} />
+                  <Route path="/clubs/:id" element={<ClubDetail />} />
                   <Route path="/cart" element={<PrivateRoute><Cart /></PrivateRoute>} />
                   <Route path="/checkout" element={<PrivateRoute><Checkout /></PrivateRoute>} />
                   <Route path="/checkout/success" element={<PrivateRoute><OrderSuccess /></PrivateRoute>} />
@@ -81,7 +87,7 @@ function App() {
                   <Route path="*" element={<Navigate to="/" replace />} />
                 </Routes>
               </main>
-              <Footer />
+              <Footer sx={{ pt: 4 }} />
             </div>
           </Router>
         </CartProvider>

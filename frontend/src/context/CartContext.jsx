@@ -65,7 +65,7 @@ export const CartProvider = ({ children }) => {
     fetchCart();
   }, [fetchCart]);
 
-  const addToCart = async (productId, quantity = 1) => {
+  const addToCart = async (productId, quantity = 1, selectedSize = null) => {
     if (!user) {
       setError('Please login to add items to cart');
       return false;
@@ -74,13 +74,19 @@ export const CartProvider = ({ children }) => {
     try {
       setLoading(true);
       
-      // Find if the item already exists in the cart
-      const existingItem = cart?.items?.find(item => item.product_id === productId);
+      // Find if the item already exists in the cart with the SAME size
+      const existingItem = cart?.items?.find(item => 
+        item.product_id === productId && 
+        (item.options?.size === selectedSize || (!item.options && !selectedSize))
+      );
+      
       const newQuantity = existingItem ? existingItem.quantity + quantity : quantity;
 
       const response = await api.post('/cart/items', {
         product_id: productId,
-        quantity: newQuantity
+        quantity: newQuantity,
+        // Include selectedSize in the request payload
+        options: selectedSize ? { size: selectedSize } : null,
       });
       
       if (response.data && response.data.cart) {

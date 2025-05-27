@@ -16,6 +16,14 @@ class Product extends Model
         'stock',
         'image',
         'category_id',
+        'size_variations',
+        'season',
+        'team_type', // home/away/third
+    ];
+
+    protected $casts = [
+        'size_variations' => 'json',
+        'price' => 'decimal:2',
     ];
 
     public function category()

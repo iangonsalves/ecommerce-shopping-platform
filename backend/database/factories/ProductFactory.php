@@ -20,6 +20,9 @@ class ProductFactory extends Factory
      */
     public function definition(): array
     {
+        $sizes = ['S', 'M', 'L', 'XL', 'XXL'];
+        $teamTypes = ['home', 'away', 'third'];
+        
         return [
             'name' => $this->faker->word,
             'description' => $this->faker->sentence,
@@ -27,6 +30,9 @@ class ProductFactory extends Factory
             'stock' => $this->faker->numberBetween(0, 100),
             'image' => $this->faker->imageUrl(400, 300),
             'category_id' => Category::factory(),
+            'size_variations' => json_encode(array_combine($sizes, array_fill(0, count($sizes), true))),
+            'season' => '2023/24',
+            'team_type' => $this->faker->randomElement($teamTypes),
         ];
     }
 }
