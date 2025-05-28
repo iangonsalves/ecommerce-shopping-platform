@@ -79,18 +79,9 @@ RUN chown -R www-data:www-data /app/storage \
     && chmod -R 775 /app/bootstrap/cache \
     && chmod -R 755 /app
 
-# Copy the entrypoint script into the container
-COPY ./entrypoint.sh /app/entrypoint.sh
 
-# Make the entrypoint script executable inside the container (redundant if done locally, but safe)
-RUN chmod +x /app/entrypoint.sh
-
-# Use the entrypoint script as the main process
-ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
-
-# CMD can be empty when ENTRYPOINT is used, or specify default arguments
-# In this case, our entrypoint script doesn't take arguments, so CMD is empty
-CMD []
+ # Keep the container running
+CMD ["tail", "-f", "/dev/null"]
 
 # Expose port 80 (Nginx default)
 EXPOSE 80
