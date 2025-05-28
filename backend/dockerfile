@@ -83,5 +83,5 @@ RUN chown -R www-data:www-data /app/storage \
 EXPOSE 80
 
 # Start supervisord (which will manage nginx and php-fpm)
-# Use bash to execute the command
-CMD ["bash", "-c", "/usr/bin/supervisord -c /etc/supervisord/supervisord.conf"]
+# Use sh to execute the command
+CMD ["/bin/sh", "-c", "/usr/bin/supervisord -c /etc/supervisord/supervisord.conf"]
