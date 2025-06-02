@@ -84,8 +84,10 @@ RUN chown -R www-data:www-data /app/storage \
 # Expose port 80 (Nginx default)
 EXPOSE 80
 
-# Temporarily use bash as entrypoint for debugging
-ENTRYPOINT ["/bin/bash"]
+# Copy the startup script into the container
+COPY ./start.sh /usr/local/bin/start.sh
+# Make the startup script executable
+RUN chmod +x /usr/local/bin/start.sh
 
-# Command to keep container running
-CMD ["-c", "while true; do sleep 1; done"]
+# Use the startup script as the entrypoint
+ENTRYPOINT ["/usr/local/bin/start.sh"]
