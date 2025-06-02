@@ -6,6 +6,10 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 # Install common system dependencies, PHP, PHP-FPM, Nginx, and Supervisor
 RUN apt-get update && apt-get install -y --no-install-recommends \
+    software-properties-common \
+    && add-apt-repository -y ppa:ondrej/php \
+    && apt-get update \
+    && apt-get install -y --no-install-recommends \
     nginx \
     supervisor \
     php8.2-fpm \
