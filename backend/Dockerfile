@@ -69,6 +69,9 @@ RUN ln -s /etc/nginx/sites-available/default /etc/nginx/sites-enabled/
 RUN sed -i 's/listen = \/run\/php\/php8.2-fpm.sock/listen = 127.0.0.1:9000/' /etc/php/8.2/fpm/pool.d/www.conf
 
 # Configure Supervisor
+# Create directory for supervisor log files
+RUN mkdir -p /var/log/supervisor && chown -R root:root /var/log/supervisor
+
 COPY ./supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
 # Adjust permissions
