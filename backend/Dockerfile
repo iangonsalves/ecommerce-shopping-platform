@@ -84,8 +84,8 @@ RUN chown -R www-data:www-data /app/storage \
 # Expose port 80 (Nginx default)
 EXPOSE 80
 
-# Use supervisord as the entrypoint
-ENTRYPOINT ["/usr/sbin/supervisord"]
+# Temporarily use bash as entrypoint for debugging
+ENTRYPOINT ["/bin/bash"]
 
-# Pass the configuration file argument to supervisord
-CMD ["-c", "/etc/supervisor/conf.d/supervisord.conf"]
+# Command to keep container running
+CMD ["-c", "while true; do sleep 1; done"]
