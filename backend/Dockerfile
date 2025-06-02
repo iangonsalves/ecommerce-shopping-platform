@@ -1,6 +1,13 @@
 # Use an official Ubuntu base image
 FROM ubuntu:22.04
 
+# Set locale to prevent issues with some commands
+RUN apt-get update && apt-get install -y locales \
+    && locale-gen en_US.UTF-8 \
+    && update-locale LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8
+ENV LANG=en_US.UTF-8
+ENV LC_ALL=en_US.UTF-8
+
 # Set environment variables to prevent interactive prompts during apt-get
 ENV DEBIAN_FRONTEND=noninteractive
 
