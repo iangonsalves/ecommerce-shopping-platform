@@ -22,7 +22,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     php8.2-mbstring \
     php8.2-xml \
     php8.2-zip \
-    php8.2-tokenizer \    php8.2-json \
+    php8.2-tokenizer \
     php8.2-bcmath \
     php8.2-gmp \
     php8.2-soap \
