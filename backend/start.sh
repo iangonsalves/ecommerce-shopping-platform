@@ -6,5 +6,5 @@ echo "Startup script started."
 # Check if supervisord exists and show its details
 ls -l /usr/sbin/supervisord
 
-# Start Supervisor with the specified configuration
-exec /usr/sbin/supervisord -c /etc/supervisor/conf.d/supervisord.conf 
+# Start Supervisor with the specified configuration (using the correct path found during build)
+exec /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf 
