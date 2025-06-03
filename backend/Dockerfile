@@ -68,6 +68,9 @@ COPY ./nginx.conf /etc/nginx/sites-available/default
 RUN ln -s /etc/nginx/sites-available/default /etc/nginx/sites-enabled/
 
 # Configure PHP-FPM
+# Create directory for PHP-FPM PID and socket files and set permissions
+RUN mkdir -p /run/php && chown -R www-data:www-data /run/php
+
 # Update listen socket path to a tcp port for easier management by Supervisor
 RUN sed -i 's/listen = \/run\/php\/php8.2-fpm.sock/listen = 127.0.0.1:9000/' /etc/php/8.2/fpm/pool.d/www.conf
 
