@@ -61,6 +61,7 @@ COPY . /app
 RUN composer install --no-dev --optimize-autoloader
 
 # Run database migrations and seeding
+RUN php artisan optimize:clear
 RUN php artisan migrate --force
 RUN php artisan db:seed
 
