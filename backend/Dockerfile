@@ -60,11 +60,6 @@ COPY . /app
 # Install PHP dependencies
 RUN composer install --no-dev --optimize-autoloader
 
-# Run database migrations and seeding
-RUN php artisan optimize:clear
-RUN php artisan migrate --force
-RUN php artisan db:seed
-
 # Configure Nginx
 # Remove the default nginx config
 RUN rm /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default
