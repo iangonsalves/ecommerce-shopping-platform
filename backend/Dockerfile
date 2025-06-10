@@ -57,6 +57,9 @@ WORKDIR /app
 # Since Render is building from the 'backend' root directory, '.' is correct here
 COPY . /app
 
+# Explicitly set LOG_CHANNEL to stderr for Render logging
+ENV LOG_CHANNEL=stderr
+
 # Install PHP dependencies
 RUN composer install --no-dev --optimize-autoloader
 
