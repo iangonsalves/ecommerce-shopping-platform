@@ -1,5 +1,8 @@
 <?php
 
+// FORCED FATAL ERROR FOR DEBUGGING - REMOVE IMMEDIATELY AFTER USE
+trigger_error('FORCED FATAL ERROR FOR DEBUGGING', E_USER_ERROR);
+
 use Illuminate\Foundation\Application;
 use Illuminate\Http\Request;
 
