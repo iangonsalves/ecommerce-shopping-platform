@@ -89,9 +89,8 @@ RUN echo "display_errors = On" >> /etc/php/8.2/fpm/php.ini \
 RUN echo "opcache.enable = 0" >> /etc/php/8.2/fpm/php.ini \
     && echo "opcache.enable_cli = 0" >> /etc/php/8.2/fpm/php.ini
 
-
-# Increase PHP memory limit for FPM
-RUN echo "memory_limit = 256M" >> /etc/php/8.2/fpm/php.ini
+# Set PHP-FPM memory limit for application processes
+RUN echo "memory_limit = 512M" >> /etc/php/8.2/fpm/php.ini
 
 # Configure Supervisor
 # Create directory for supervisor log files
