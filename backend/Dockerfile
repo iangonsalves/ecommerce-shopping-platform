@@ -82,6 +82,10 @@ RUN echo "display_errors = On" >> /etc/php/8.2/fpm/php.ini \
     && echo "display_startup_errors = On" >> /etc/php/8.2/fpm/php.ini \
     && echo "error_reporting = E_ALL" >> /etc/php/8.2/fpm/php.ini
 
+# Explicitly disable OPCache for debugging early boot issues
+RUN echo "opcache.enable = 0" >> /etc/php/8.2/fpm/php.ini \
+    && echo "opcache.enable_cli = 0" >> /etc/php/8.2/fpm/php.ini
+
 # Configure Supervisor
 # Create directory for supervisor log files
 RUN mkdir -p /var/log/supervisor && chown -R root:root /var/log/supervisor
