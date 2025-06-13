@@ -1,5 +1,7 @@
 <?php
 
+echo "TEST MESSAGE"; // TEMPORARY DEBUG
+
 use Illuminate\Foundation\Application;
 use Illuminate\Http\Request;
 
