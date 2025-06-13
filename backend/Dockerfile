@@ -60,6 +60,9 @@ COPY . /app
 # Explicitly set LOG_CHANNEL to stderr for Render logging
 ENV LOG_CHANNEL=stderr
 
+# Allow Composer to run plugins as root during build
+ENV COMPOSER_ALLOW_SUPERUSER=1
+
 # Install PHP dependencies
 RUN composer install --no-dev --optimize-autoloader
 

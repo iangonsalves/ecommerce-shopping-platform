@@ -1,6 +1,5 @@
 <?php
 
-dd('Laravel is booting...'); // TEMPORARY DEBUG LINE
 
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
