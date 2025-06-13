@@ -26,5 +26,5 @@ try {
 } catch (Throwable $e) {
     error_log("Caught Fatal Exception in index.php: " . $e->getMessage() . "\n" . $e->getTraceAsString(), 3, "/dev/stderr");
     http_response_code(500);
-    echo "500 Server Error: An unhandled exception occurred.";
+    die("500 Server Error: Unhandled Exception. Details in logs (hopefully): " . $e->getMessage() . "\n" . $e->getTraceAsString());
 }
