@@ -18,5 +18,3 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withExceptions(function (Exceptions $exceptions) {
         //
     })->create();
-
-throw new \Exception('Test Error'); // TEMPORARY DEBUG LINE
