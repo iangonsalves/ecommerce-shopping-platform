@@ -78,7 +78,8 @@ RUN ln -s /etc/nginx/sites-available/default /etc/nginx/sites-enabled/
 RUN mkdir -p /run/php && chown -R www-data:www-data /run/php
 
 # Update listen socket path to a tcp port for easier management by Supervisor
-RUN sed -i 's/listen = \/run\/php\/php8.2-fpm.sock/listen = 127.0.0.1:9000/' /etc/php/8.2/fpm/pool.d/www.conf
+RUN sed -i 's/listen = \/run\/php\/php8.2-fpm.sock/listen = 127.0.0.1:9000/' /etc/php/8.2/fpm/pool.d/www.conf \
+    && echo "clear_env = no" >> /etc/php/8.2/fpm/pool.d/www.conf
 
 # Direct PHP-FPM's error log to stderr and enable aggressive logging
 RUN echo "php_admin_value[error_log] = /dev/stderr" >> /etc/php/8.2/fpm/pool.d/www.conf \

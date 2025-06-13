@@ -1,12 +1,5 @@
 <?php
 
-// TEMPORARY DEBUG: Check if APP_KEY is set very early
-if (!isset($_ENV['APP_KEY']) || empty($_ENV['APP_KEY'])) {
-    echo "<h1>Error: APP_KEY is not set or is empty!</h1>";
-    echo "<p>Please ensure APP_KEY is configured as an environment variable in your Render dashboard.</p>";
-    exit;
-}
-
 use Illuminate\Foundation\Application;
 use Illuminate\Http\Request;
 
