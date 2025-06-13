@@ -80,8 +80,10 @@ RUN mkdir -p /run/php && chown -R www-data:www-data /run/php
 # Update listen socket path to a tcp port for easier management by Supervisor
 RUN sed -i 's/listen = \/run\/php\/php8.2-fpm.sock/listen = 127.0.0.1:9000/' /etc/php/8.2/fpm/pool.d/www.conf
 
-# Direct PHP-FPM's error log to stderr
-RUN echo "php_admin_value[error_log] = /dev/stderr" >> /etc/php/8.2/fpm/pool.d/www.conf
+# Direct PHP-FPM's error log to stderr and enable aggressive logging
+RUN echo "php_admin_value[error_log] = /dev/stderr" >> /etc/php/8.2/fpm/pool.d/www.conf \
+    && echo "php_admin_flag[log_errors] = on" >> /etc/php/8.2/fpm/pool.d/www.conf \
+    && echo "catch_workers_output = yes" >> /etc/php/8.2/fpm/pool.d/www.conf
 
 # Add custom php.ini for FPM to ensure errors are displayed in logs
 RUN echo "display_errors = On" >> /etc/php/8.2/fpm/php.ini \
