@@ -55,7 +55,7 @@ function App() {
                 style={{ flex: 1, backgroundColor: '#fff' }}
               >
                 <Routes>
-                  <Route path="/" element={<Home />} />
+                  <Route path="/" element={<PrivateRoute><Home /></PrivateRoute>} />
                   <Route path="/login" element={<Login />} />
                   <Route path="/register" element={<Register />} />
                   <Route path="/products" element={<ProductList />} />

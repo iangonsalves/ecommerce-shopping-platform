@@ -20,6 +20,8 @@ export const AuthProvider = ({ children }) => {
         const response = await api.get('/user');
         console.log('Auth check response:', response.data);
         setUser(response.data);
+      } else {
+        setUser(null);
       }
     } catch (err) {
       console.error('Auth check error:', err);
@@ -108,7 +110,8 @@ export const AuthProvider = ({ children }) => {
     login,
     register,
     logout,
-    isAdmin: user?.role === 'admin'
+    isAdmin: user?.role === 'admin',
+    checkAuth
   };
 
   return (
