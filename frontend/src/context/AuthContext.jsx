@@ -8,21 +8,22 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // Initialize auth state from localStorage
   useEffect(() => {
-    checkAuth();
+    const token = localStorage.getItem('token');
+    if (token) {
+      api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+      // Only fetch user data if we have a token
+      checkAuth();
+    } else {
+      setLoading(false);
+    }
   }, []);
 
   const checkAuth = async () => {
     try {
-      const token = localStorage.getItem('token');
-      if (token) {
-        api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-        const response = await api.get('/user');
-        console.log('Auth check response:', response.data);
-        setUser(response.data);
-      } else {
-        setUser(null);
-      }
+      const response = await api.get('/user');
+      setUser(response.data);
     } catch (err) {
       console.error('Auth check error:', err);
       localStorage.removeItem('token');
@@ -34,28 +35,21 @@ export const AuthProvider = ({ children }) => {
   };
 
   const login = async (email, password) => {
-    setLoading(true);
-    setError(null);
-    
     try {
-      const response = await api.post('/login', {
-        email,
-        password
-      });
-      
+      const response = await api.post('/login', { email, password });
       const { token, user } = response.data;
-      console.log('Login response:', { token: !!token, user });
+      
+      // Set token and headers immediately
       localStorage.setItem('token', token);
       api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+      
+      // Update user state
       setUser(user);
       return user;
     } catch (err) {
-      console.error('Login error:', err.response?.data || err.message);
       const errorMessage = err.response?.data?.message || 'Login failed';
       setError(errorMessage);
       throw new Error(errorMessage);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -86,20 +80,14 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = async () => {
-    setLoading(true);
     try {
-      const token = localStorage.getItem('token');
-      if (token) {
-        api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-        await api.post('/logout');
-      }
+      await api.post('/logout');
     } catch (err) {
       console.error('Logout error:', err);
     } finally {
       localStorage.removeItem('token');
       delete api.defaults.headers.common['Authorization'];
       setUser(null);
-      setLoading(false);
     }
   };
 

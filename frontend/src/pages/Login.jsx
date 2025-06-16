@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Typography, Box, Alert, CircularProgress } from '@mui/material';
+import { Typography, Box, Alert } from '@mui/material';
 import { useAuth } from '../context/AuthContext';
 import PageContainer from '../components/layout/PageContainer';
 import FormTextField from '../components/form/FormTextField';
@@ -16,26 +16,27 @@ const Login = () => {
   const { login } = useAuth();
   const navigate = useNavigate();
 
-  const handleChange = (e) => {
+  const handleChange = useCallback((e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
       [name]: value
     }));
-    // Clear error when user starts typing
     if (error) setError('');
-  };
+  }, [error]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (loading) return; // Prevent double submission
+    
     setLoading(true);
     setError('');
 
     try {
       await login(formData.email, formData.password);
-      navigate('/');
+      navigate('/', { replace: true });
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to login');
+      setError(err.message || 'Failed to login');
     } finally {
       setLoading(false);
     }
@@ -62,6 +63,7 @@ const Login = () => {
           value={formData.email}
           onChange={handleChange}
           required
+          disabled={loading}
         />
         
         <FormTextField
@@ -72,6 +74,7 @@ const Login = () => {
           value={formData.password}
           onChange={handleChange}
           required
+          disabled={loading}
         />
 
         <LoadingButton
@@ -81,6 +84,7 @@ const Login = () => {
           sx={{ mt: 3, mb: 2 }}
           loading={loading}
           loadingText="Logging in..."
+          disabled={loading}
         >
           Login
         </LoadingButton>
