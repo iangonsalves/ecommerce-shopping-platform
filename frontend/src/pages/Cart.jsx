@@ -189,7 +189,7 @@ const Cart = () => {
                 <Grid item xs={12} sm={3}>
                   <Typography variant="h6">{item.product?.name || 'Product'}</Typography>
                   <Typography variant="body2" color="text.secondary">
-                    ${item.price.toFixed(2)}
+                    ${Number(item.price || 0).toFixed(2)}
                   </Typography>
                   {/* Display selected size if available */}
                   {item.options?.size && (

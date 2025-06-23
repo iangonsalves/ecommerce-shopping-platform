@@ -21,7 +21,7 @@ export const CartProvider = ({ children }) => {
   const fetchCart = useCallback(async () => {
     if (authLoading) {
       setLoading(true);
-      return; // Wait for auth to complete
+      return;
     }
     
     if (!user) {
@@ -33,19 +33,7 @@ export const CartProvider = ({ children }) => {
 
     try {
       setLoading(true);
-      const token = localStorage.getItem('token');
-      if (!token) {
-        setCart(null);
-        setError('Please log in to view your cart');
-        setLoading(false);
-        return;
-      }
-
-      const response = await api.get('/cart', {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
+      const response = await api.get('/cart');
       setCart(response.data);
       setError(null);
     } catch (err) {
@@ -74,20 +62,20 @@ export const CartProvider = ({ children }) => {
     try {
       setLoading(true);
       
-      // Find if the item already exists in the cart with the SAME size
-      const existingItem = cart?.items?.find(item => 
-        item.product_id === productId && 
-        (item.options?.size === selectedSize || (!item.options && !selectedSize))
-      );
-      
-      const newQuantity = existingItem ? existingItem.quantity + quantity : quantity;
-
-      const response = await api.post('/cart/items', {
+      // Simplified payload
+      const payload = {
         product_id: productId,
-        quantity: newQuantity,
-        // Include selectedSize in the request payload
-        options: selectedSize ? { size: selectedSize } : null,
-      });
+        quantity: quantity,
+      };
+
+      // Only add options if size is provided
+      if (selectedSize) {
+        payload.options = { size: selectedSize };
+      }
+
+      console.log('Adding to cart with payload:', payload); // Debug log
+
+      const response = await api.post('/cart/items', payload);
       
       if (response.data && response.data.cart) {
         setCart(response.data.cart);
@@ -97,10 +85,11 @@ export const CartProvider = ({ children }) => {
       return false;
     } catch (err) {
       console.error('Error adding to cart:', err);
+      console.error('Error response:', err.response?.data); // Debug log
       if (err.response?.status === 401) {
         setError('Please log in to add items to your cart');
       } else {
-        setError('Failed to add item to cart');
+        setError(err.response?.data?.message || 'Failed to add item to cart');
       }
       return false;
     } finally {

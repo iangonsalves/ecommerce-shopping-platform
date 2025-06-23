@@ -106,7 +106,7 @@ const OrderHistory = () => {
                 <TableRow key={order.id}>
                   <TableCell>#{order.id}</TableCell>
                   <TableCell>{formatDate(order.created_at)}</TableCell>
-                  <TableCell>${order.total.toFixed(2)}</TableCell>
+                  <TableCell>${Number(order.total || 0).toFixed(2)}</TableCell>
                   <TableCell>
                     <Chip 
                       label={order.status} 
