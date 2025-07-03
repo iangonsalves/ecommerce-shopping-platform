@@ -103,7 +103,7 @@ const PaymentForm = ({ clientSecret, setPaymentError, onPaymentSuccess, total })
         disabled={!stripe || !elements || !clientSecret || processing}
         fullWidth
       >
-        {processing ? <CircularProgress size={24} /> : `Pay $${total?.toFixed(2) || '0.00'}`}
+        {processing ? <CircularProgress size={24} /> : `Pay $${Number(total || 0).toFixed(2)}`}
       </Button>
     </form>
   );
@@ -400,7 +400,7 @@ const CheckoutContent = () => {
                       </Grid>
                       <Grid item xs={3}>
                         <Typography variant="subtitle1">
-                          ${(item.price * item.quantity).toFixed(2)}
+                          ${Number(item.price * item.quantity).toFixed(2)}
                         </Typography>
                       </Grid>
                     </Grid>
@@ -422,7 +422,7 @@ const CheckoutContent = () => {
             <Grid container spacing={2}>
               <Grid item xs={12}>
                 <Typography variant="h5">
-                  Total: ${cart?.total?.toFixed(2) || '0.00'}
+                  Total: ${Number(cart?.total || 0).toFixed(2)}
                 </Typography>
               </Grid>
             </Grid>
