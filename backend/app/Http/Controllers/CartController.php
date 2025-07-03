@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use Illuminate\Support\Facades\Log;
 use App\Models\Cart;
 use App\Models\CartItem;
 use App\Models\Product;
@@ -31,8 +31,9 @@ class CartController extends Controller
         $request->validate([
             'product_id' => 'required|exists:products,id',
             'quantity' => 'required|integer|min:1',
-            'options' => 'nullable|json',
-        ]);
+            'options' => 'nullable|array',
+            ]);
+            Log::info('Validation rule in use', ['rule' => 'array']);
 
         $cart = Cart::firstOrCreate(
             ['user_id' => Auth::id()],
@@ -41,18 +42,25 @@ class CartController extends Controller
 
         $product = Product::findOrFail($request->product_id);
         
-        $cartItem = CartItem::updateOrCreate(
-            [
+        $cartItem = CartItem::where('cart_id', $cart->id)
+            ->where('product_id', $product->id)
+            ->whereRaw('options::jsonb = ?::jsonb', [
+                json_encode($request->input('options')) ?? '{}'
+            ])
+            ->first();
+
+        if ($cartItem) {
+            $cartItem->quantity += $request->quantity;
+            $cartItem->save();
+        } else {
+            $cartItem = CartItem::create([
                 'cart_id' => $cart->id,
                 'product_id' => $product->id,
-                'options' => $request->input('options'),
-            ],
-            [
                 'quantity' => $request->quantity,
                 'price' => $product->price,
                 'options' => $request->input('options'),
-            ]
-        );
+            ]);
+        }
 
         $this->updateCartTotal($cart);
 

@@ -70,7 +70,7 @@ export const CartProvider = ({ children }) => {
 
       // Only add options if size is provided
       if (selectedSize) {
-        payload.options = JSON.stringify({ size: selectedSize });
+        payload.options = selectedSize ? { size: selectedSize } : null;
       }
 
       console.log('Adding to cart with payload:', payload); // Debug log
