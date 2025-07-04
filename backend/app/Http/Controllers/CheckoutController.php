@@ -77,6 +77,10 @@ class CheckoutController extends Controller
             // Try to create the Order
             try {
                 $order = Order::create($orderData);
+                // Force commit to surface any DB errors immediately after order creation
+                DB::commit();
+                // Start a new transaction for order items
+                DB::beginTransaction();
             } catch (\Exception $e) {
                 Log::error('Order creation exception: ' . $e->getMessage(), ['order_data' => $orderData]);
                 return response()->json([
