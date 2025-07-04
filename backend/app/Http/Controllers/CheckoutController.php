@@ -103,7 +103,7 @@ class CheckoutController extends Controller
                 } catch (\Exception $e) {
                     return response()->json([
                         'status' => 'error',
-                        'message' => 'OrderItem creation failed',
+                        'message' => 'OrderItem creation failed: ' + $e->getMessage(),
                         'error_details' => $e->getMessage(),
                         'order_item_data' => $itemData
                     ], 500);
