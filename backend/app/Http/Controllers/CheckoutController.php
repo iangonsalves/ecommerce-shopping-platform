@@ -77,6 +77,8 @@ class CheckoutController extends Controller
             // Try to create the Order
             try {
                 $order = Order::create($orderData);
+                Log::error('Order object after create', ['order' => $order]);
+                Log::error('All orders for user', ['orders' => Order::where('user_id', $user->id)->get()]);
                 // Force commit to surface any DB errors immediately after order creation
                 DB::commit();
                 // Start a new transaction for order items
