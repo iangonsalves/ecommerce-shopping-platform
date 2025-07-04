@@ -74,8 +74,17 @@ class CheckoutController extends Controller
             ];
             Log::info('Order data to be inserted', $orderData);
 
-            // Create the Order
-            $order = Order::create($orderData);
+            // Try to create the Order
+            try {
+                $order = Order::create($orderData);
+            } catch (\Exception $e) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Order creation failed',
+                    'error_details' => $e->getMessage(),
+                    'order_data' => $orderData
+                ], 500);
+            }
 
             // Prepare order items data for debug
             $orderItemsData = [];
@@ -89,7 +98,16 @@ class CheckoutController extends Controller
                 ];
                 Log::info('OrderItem data to be inserted', $itemData);
                 $orderItemsData[] = $itemData;
-                OrderItem::create($itemData);
+                try {
+                    OrderItem::create($itemData);
+                } catch (\Exception $e) {
+                    return response()->json([
+                        'status' => 'error',
+                        'message' => 'OrderItem creation failed',
+                        'error_details' => $e->getMessage(),
+                        'order_item_data' => $itemData
+                    ], 500);
+                }
             }
 
             // Clear the user's cart (delete items, then the cart itself)
