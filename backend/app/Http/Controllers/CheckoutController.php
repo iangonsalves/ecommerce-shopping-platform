@@ -77,15 +77,8 @@ class CheckoutController extends Controller
             // Try to create the Order
             try {
                 $order = Order::create($orderData);
-                // Manual check: ensure order was actually created
-                if (!$order || !$order->id || !Order::find($order->id)) {
-                    return response()->json([
-                        'status' => 'error',
-                        'message' => 'Order creation failed: Order not found after insert. There may be a DB constraint or trigger issue.',
-                        'order_data' => $orderData
-                    ], 500);
-                }
             } catch (\Exception $e) {
+                Log::error('Order creation exception: ' . $e->getMessage(), ['order_data' => $orderData]);
                 return response()->json([
                     'status' => 'error',
                     'message' => 'Order creation failed: ' . $e->getMessage(),
