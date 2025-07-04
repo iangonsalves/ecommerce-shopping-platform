@@ -383,7 +383,17 @@ const CheckoutContent = () => {
                     <Grid container spacing={2} alignItems="center">
                       <Grid item xs={3}>
                         <img
-                          src={item.product.image || item.product.image_url || 'https://via.placeholder.com/100'}
+                          src={
+                            item.product.image
+                              ? (item.product.image.startsWith('http://') || item.product.image.startsWith('https://')
+                                  ? item.product.image
+                                  : `${import.meta.env.VITE_API_BASE_URL.replace('/api', '')}/${item.product.image}`)
+                              : (item.product.image_url
+                                  ? (item.product.image_url.startsWith('http://') || item.product.image_url.startsWith('https://')
+                                      ? item.product.image_url
+                                      : `${import.meta.env.VITE_API_BASE_URL.replace('/api', '')}/${item.product.image_url}`)
+                                  : 'https://via.placeholder.com/100')
+                          }
                           alt={item.product.name}
                           style={{ width: '100%', height: 'auto' }}
                         />
