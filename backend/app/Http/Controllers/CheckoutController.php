@@ -56,6 +56,23 @@ class CheckoutController extends Controller
         try {
             $shippingData = $request->input('shipping');
 
+            // Debug: Log order data before creation
+            Log::info('Order data to be inserted', [
+                'user_id' => $user->id,
+                'total' => $cart->total,
+                'status' => 'pending',
+                'shipping_first_name' => $shippingData['firstName'],
+                'shipping_last_name' => $shippingData['lastName'],
+                'shipping_address1' => $shippingData['address1'],
+                'shipping_address2' => $shippingData['address2'] ?? null,
+                'shipping_city' => $shippingData['city'],
+                'shipping_state' => $shippingData['state'],
+                'shipping_zip' => $shippingData['zip'],
+                'shipping_country' => $shippingData['country'],
+                'shipping_phone' => $shippingData['phone'],
+                'payment_status' => 'pending',
+            ]);
+
             // Create the Order
             $order = Order::create([
                 'user_id' => $user->id,
@@ -75,8 +92,15 @@ class CheckoutController extends Controller
                 // 'transaction_id' => null, // Add when payment gateway provides it
             ]);
 
-            // Create OrderItems from CartItems
+            // Debug: Log each order item data before creation
             foreach ($cart->items as $cartItem) {
+                Log::info('OrderItem data to be inserted', [
+                    'order_id' => $order->id,
+                    'product_id' => $cartItem->product_id,
+                    'product_name' => $cartItem->product->name,
+                    'quantity' => $cartItem->quantity,
+                    'price' => $cartItem->price,
+                ]);
                 OrderItem::create([
                     'order_id' => $order->id,
                     'product_id' => $cartItem->product_id,
