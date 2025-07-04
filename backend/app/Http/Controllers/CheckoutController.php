@@ -56,8 +56,8 @@ class CheckoutController extends Controller
         try {
             $shippingData = $request->input('shipping');
 
-            // Debug: Log order data before creation
-            Log::info('Order data to be inserted', [
+            // Prepare order data for debug
+            $orderData = [
                 'user_id' => $user->id,
                 'total' => $cart->total,
                 'status' => 'pending',
@@ -71,43 +71,25 @@ class CheckoutController extends Controller
                 'shipping_country' => $shippingData['country'],
                 'shipping_phone' => $shippingData['phone'],
                 'payment_status' => 'pending',
-            ]);
+            ];
+            Log::info('Order data to be inserted', $orderData);
 
             // Create the Order
-            $order = Order::create([
-                'user_id' => $user->id,
-                'total' => $cart->total, // Use the cart's calculated total
-                'status' => 'pending', // Initial status
-                'shipping_first_name' => $shippingData['firstName'],
-                'shipping_last_name' => $shippingData['lastName'],
-                'shipping_address1' => $shippingData['address1'],
-                'shipping_address2' => $shippingData['address2'] ?? null,
-                'shipping_city' => $shippingData['city'],
-                'shipping_state' => $shippingData['state'],
-                'shipping_zip' => $shippingData['zip'],
-                'shipping_country' => $shippingData['country'],
-                'shipping_phone' => $shippingData['phone'],
-                'payment_status' => 'pending', // Initial payment status
-                // 'payment_method' => $request->input('payment.method'), // Add when payment method is implemented
-                // 'transaction_id' => null, // Add when payment gateway provides it
-            ]);
+            $order = Order::create($orderData);
 
-            // Debug: Log each order item data before creation
+            // Prepare order items data for debug
+            $orderItemsData = [];
             foreach ($cart->items as $cartItem) {
-                Log::info('OrderItem data to be inserted', [
+                $itemData = [
                     'order_id' => $order->id,
                     'product_id' => $cartItem->product_id,
                     'product_name' => $cartItem->product->name,
                     'quantity' => $cartItem->quantity,
                     'price' => $cartItem->price,
-                ]);
-                OrderItem::create([
-                    'order_id' => $order->id,
-                    'product_id' => $cartItem->product_id,
-                    'product_name' => $cartItem->product->name, // Store name at time of order
-                    'quantity' => $cartItem->quantity,
-                    'price' => $cartItem->price, // Store price at time of order
-                ]);
+                ];
+                Log::info('OrderItem data to be inserted', $itemData);
+                $orderItemsData[] = $itemData;
+                OrderItem::create($itemData);
             }
 
             // Clear the user's cart (delete items, then the cart itself)
@@ -130,16 +112,16 @@ class CheckoutController extends Controller
         } catch (\Exception $e) {
             // Rollback transaction on error
             DB::rollBack();
-            
             // Log the detailed error
             Log::error('Order placement failed for user ' . $user->id . ': ' . $e->getMessage(), [
                 'exception' => $e
             ]);
-
             return response()->json([
                 'status' => 'error',
                 'message' => 'Failed to place order. An internal error occurred. Please try again later.',
-                'error_details' => $e->getMessage() // TEMPORARY: Remove in production!
+                'error_details' => $e->getMessage(), // TEMPORARY: Remove in production!
+                'order_data' => $orderData ?? null,
+                'order_items_data' => $orderItemsData ?? null
             ], 500);
         }
     }
