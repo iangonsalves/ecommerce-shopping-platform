@@ -72,7 +72,7 @@ class CheckoutController extends Controller
                 'shipping_phone' => $shippingData['phone'],
                 'payment_status' => 'pending',
             ];
-            Log::info('Order data to be inserted', $orderData);
+            Log::error('Order data to be inserted', $orderData);
 
             // Try to create the Order
             try {
@@ -96,7 +96,7 @@ class CheckoutController extends Controller
                     'quantity' => $cartItem->quantity,
                     'price' => $cartItem->price,
                 ];
-                Log::info('OrderItem data to be inserted', $itemData);
+                Log::error('OrderItem data to be inserted', $itemData);
                 $orderItemsData[] = $itemData;
                 try {
                     OrderItem::create($itemData);
