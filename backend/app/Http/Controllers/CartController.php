@@ -1,7 +1,6 @@
 <?php
 
 namespace App\Http\Controllers;
-use Illuminate\Support\Facades\Log;
 use App\Models\Cart;
 use App\Models\CartItem;
 use App\Models\Product;
@@ -33,7 +32,6 @@ class CartController extends Controller
             'quantity' => 'required|integer|min:1',
             'options' => 'nullable|array',
             ]);
-            Log::info('Validation rule in use', ['rule' => 'array']);
 
         $cart = Cart::firstOrCreate(
             ['user_id' => Auth::id()],
