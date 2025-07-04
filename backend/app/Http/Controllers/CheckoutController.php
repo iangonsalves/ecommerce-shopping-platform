@@ -115,7 +115,7 @@ class CheckoutController extends Controller
             return response()->json([
                 'status' => 'error',
                 'message' => 'Failed to place order. An internal error occurred. Please try again later.',
-                // 'error_details' => $e->getMessage() // Avoid sending detailed errors in production
+                'error_details' => $e->getMessage() // TEMPORARY: Remove in production!
             ], 500);
         }
     }
