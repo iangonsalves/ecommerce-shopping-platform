@@ -50,10 +50,13 @@ class CheckoutController extends Controller
             return response()->json(['status' => 'error', 'message' => 'Your cart is empty.'], 400);
         }
 
+        // Use a database transaction to ensure atomicity
+        DB::beginTransaction();
+
         try {
             $shippingData = $request->input('shipping');
 
-            // Prepare order data for debug
+            // Prepare order data
             $orderData = [
                 'user_id' => $user->id,
                 'total' => (float) $cart->total,
@@ -69,24 +72,11 @@ class CheckoutController extends Controller
                 'shipping_phone' => $shippingData['phone'],
                 'payment_status' => 'pending',
             ];
-            Log::error('Order data to be inserted', $orderData);
 
             // Try to create the Order
-            try {
-                $order = Order::create($orderData);
-                Log::error('Order object after create', ['order' => $order]);
-                Log::error('All orders for user', ['orders' => Order::where('user_id', $user->id)->get()]);
-            } catch (\Exception $e) {
-                Log::error('Order creation exception: ' . $e->getMessage(), ['order_data' => $orderData]);
-                return response()->json([
-                    'status' => 'error',
-                    'message' => 'Order creation failed: ' . $e->getMessage(),
-                    'order_data' => $orderData
-                ], 500);
-            }
+            $order = Order::create($orderData);
 
-            // Prepare order items data for debug
-            $orderItemsData = [];
+            // Create order items
             foreach ($cart->items as $cartItem) {
                 $itemData = [
                     'order_id' => $order->id,
@@ -95,18 +85,7 @@ class CheckoutController extends Controller
                     'quantity' => $cartItem->quantity,
                     'price' => $cartItem->price,
                 ];
-                Log::error('OrderItem data to be inserted', $itemData);
-                $orderItemsData[] = $itemData;
-                try {
-                    OrderItem::create($itemData);
-                } catch (\Exception $e) {
-                    return response()->json([
-                        'status' => 'error',
-                        'message' => 'OrderItem creation failed:',
-                        'error_details' => $e->getMessage(),
-                        'order_item_data' => $itemData
-                    ], 500);
-                }
+                OrderItem::create($itemData);
             }
 
             // Clear the user's cart (delete items, then the cart itself)
@@ -123,19 +102,16 @@ class CheckoutController extends Controller
             return response()->json([
                 'status' => 'success',
                 'message' => 'Order placed successfully!',
-                'order' => $order->load('items') // Optionally return the created order
+                'order' => $order->load('items')
             ], 201);
 
         } catch (\Exception $e) {
-            Log::error('Order placement failed for user ' . $user->id . ': ' . $e->getMessage(), [
-                'exception' => $e
-            ]);
+            // Rollback transaction on error
+            DB::rollBack();
             return response()->json([
                 'status' => 'error',
                 'message' => 'Failed to place order. An internal error occurred. Please try again later.',
                 'error_details' => $e->getMessage(),
-                'order_data' => $orderData ?? null,
-                'order_items_data' => $orderItemsData ?? null
             ], 500);
         }
     }

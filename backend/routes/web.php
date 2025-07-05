@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return response()->json([
         'status' => 'success',
-        'message' => 'E-commerce Platform API is running',
+        'message' => 'Alex Jersey Hub API is running',
         'version' => '1.0.0'
     ]);
 });
