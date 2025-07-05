@@ -50,16 +50,13 @@ class CheckoutController extends Controller
             return response()->json(['status' => 'error', 'message' => 'Your cart is empty.'], 400);
         }
 
-        // Use a database transaction to ensure atomicity
-        DB::beginTransaction();
-
         try {
             $shippingData = $request->input('shipping');
 
             // Prepare order data for debug
             $orderData = [
                 'user_id' => $user->id,
-                'total' => $cart->total,
+                'total' => (float) $cart->total,
                 'status' => 'pending',
                 'shipping_first_name' => $shippingData['firstName'],
                 'shipping_last_name' => $shippingData['lastName'],
@@ -79,10 +76,6 @@ class CheckoutController extends Controller
                 $order = Order::create($orderData);
                 Log::error('Order object after create', ['order' => $order]);
                 Log::error('All orders for user', ['orders' => Order::where('user_id', $user->id)->get()]);
-                // Force commit to surface any DB errors immediately after order creation
-                DB::commit();
-                // Start a new transaction for order items
-                DB::beginTransaction();
             } catch (\Exception $e) {
                 Log::error('Order creation exception: ' . $e->getMessage(), ['order_data' => $orderData]);
                 return response()->json([
@@ -134,16 +127,13 @@ class CheckoutController extends Controller
             ], 201);
 
         } catch (\Exception $e) {
-            // Rollback transaction on error
-            DB::rollBack();
-            // Log the detailed error
             Log::error('Order placement failed for user ' . $user->id . ': ' . $e->getMessage(), [
                 'exception' => $e
             ]);
             return response()->json([
                 'status' => 'error',
                 'message' => 'Failed to place order. An internal error occurred. Please try again later.',
-                'error_details' => $e->getMessage(), // TEMPORARY: Remove in production!
+                'error_details' => $e->getMessage(),
                 'order_data' => $orderData ?? null,
                 'order_items_data' => $orderItemsData ?? null
             ], 500);
