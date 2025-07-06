@@ -103,7 +103,7 @@ const PaymentForm = ({ clientSecret, setPaymentError, onPaymentSuccess, total })
         disabled={!stripe || !elements || !clientSecret || processing}
         fullWidth
       >
-        {processing ? <CircularProgress size={24} /> : `Pay $${total?.toFixed(2) || '0.00'}`}
+        {processing ? <CircularProgress size={24} /> : `Pay $${Number(total || 0).toFixed(2)}`}
       </Button>
     </form>
   );
@@ -383,7 +383,17 @@ const CheckoutContent = () => {
                     <Grid container spacing={2} alignItems="center">
                       <Grid item xs={3}>
                         <img
-                          src={item.product.image || item.product.image_url || 'https://via.placeholder.com/100'}
+                          src={
+                            item.product.image
+                              ? (item.product.image.startsWith('http://') || item.product.image.startsWith('https://')
+                                  ? item.product.image
+                                  : `${import.meta.env.VITE_API_BASE_URL.replace('/api', '')}/${item.product.image}`)
+                              : (item.product.image_url
+                                  ? (item.product.image_url.startsWith('http://') || item.product.image_url.startsWith('https://')
+                                      ? item.product.image_url
+                                      : `${import.meta.env.VITE_API_BASE_URL.replace('/api', '')}/${item.product.image_url}`)
+                                  : 'https://via.placeholder.com/100')
+                          }
                           alt={item.product.name}
                           style={{ width: '100%', height: 'auto' }}
                         />
@@ -400,7 +410,7 @@ const CheckoutContent = () => {
                       </Grid>
                       <Grid item xs={3}>
                         <Typography variant="subtitle1">
-                          ${(item.price * item.quantity).toFixed(2)}
+                          ${Number(item.price * item.quantity).toFixed(2)}
                         </Typography>
                       </Grid>
                     </Grid>
@@ -422,7 +432,7 @@ const CheckoutContent = () => {
             <Grid container spacing={2}>
               <Grid item xs={12}>
                 <Typography variant="h5">
-                  Total: ${cart?.total?.toFixed(2) || '0.00'}
+                  Total: ${Number(cart?.total || 0).toFixed(2)}
                 </Typography>
               </Grid>
             </Grid>

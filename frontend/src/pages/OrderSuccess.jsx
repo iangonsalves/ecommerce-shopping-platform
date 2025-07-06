@@ -107,7 +107,7 @@ const OrderSuccess = () => {
           <ListItem>
             <ListItemText 
               primary="Total Amount" 
-              secondary={`$${order.total.toFixed(2)}`} 
+              secondary={`$${Number(order.total || 0).toFixed(2)}`} 
             />
           </ListItem>
           <ListItem>

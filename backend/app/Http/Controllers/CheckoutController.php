@@ -56,11 +56,11 @@ class CheckoutController extends Controller
         try {
             $shippingData = $request->input('shipping');
 
-            // Create the Order
-            $order = Order::create([
+            // Prepare order data
+            $orderData = [
                 'user_id' => $user->id,
-                'total' => $cart->total, // Use the cart's calculated total
-                'status' => 'pending', // Initial status
+                'total' => (float) $cart->total,
+                'status' => 'pending',
                 'shipping_first_name' => $shippingData['firstName'],
                 'shipping_last_name' => $shippingData['lastName'],
                 'shipping_address1' => $shippingData['address1'],
@@ -70,20 +70,22 @@ class CheckoutController extends Controller
                 'shipping_zip' => $shippingData['zip'],
                 'shipping_country' => $shippingData['country'],
                 'shipping_phone' => $shippingData['phone'],
-                'payment_status' => 'pending', // Initial payment status
-                // 'payment_method' => $request->input('payment.method'), // Add when payment method is implemented
-                // 'transaction_id' => null, // Add when payment gateway provides it
-            ]);
+                'payment_status' => 'pending',
+            ];
 
-            // Create OrderItems from CartItems
+            // Try to create the Order
+            $order = Order::create($orderData);
+
+            // Create order items
             foreach ($cart->items as $cartItem) {
-                OrderItem::create([
+                $itemData = [
                     'order_id' => $order->id,
                     'product_id' => $cartItem->product_id,
-                    'product_name' => $cartItem->product->name, // Store name at time of order
+                    'product_name' => $cartItem->product->name,
                     'quantity' => $cartItem->quantity,
-                    'price' => $cartItem->price, // Store price at time of order
-                ]);
+                    'price' => $cartItem->price,
+                ];
+                OrderItem::create($itemData);
             }
 
             // Clear the user's cart (delete items, then the cart itself)
@@ -100,22 +102,16 @@ class CheckoutController extends Controller
             return response()->json([
                 'status' => 'success',
                 'message' => 'Order placed successfully!',
-                'order' => $order->load('items') // Optionally return the created order
+                'order' => $order->load('items')
             ], 201);
 
         } catch (\Exception $e) {
             // Rollback transaction on error
             DB::rollBack();
-            
-            // Log the detailed error
-            Log::error('Order placement failed for user ' . $user->id . ': ' . $e->getMessage(), [
-                'exception' => $e
-            ]);
-
             return response()->json([
                 'status' => 'error',
                 'message' => 'Failed to place order. An internal error occurred. Please try again later.',
-                // 'error_details' => $e->getMessage() // Avoid sending detailed errors in production
+                'error_details' => $e->getMessage(),
             ], 500);
         }
     }
