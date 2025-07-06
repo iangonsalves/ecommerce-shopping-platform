@@ -21,7 +21,7 @@ const Home = () => {
             size="large"
             sx={{ mr: 2 }}
           >
-            Browse Products
+            Browse Jerseys
           </Button>
           <Button
             component={Link}
@@ -30,7 +30,7 @@ const Home = () => {
             color="primary"
             size="large"
           >
-            View Categories
+            View Leagues
           </Button>
         </Box>
       </Box>
