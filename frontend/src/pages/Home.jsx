@@ -7,10 +7,10 @@ const Home = () => {
     <Container>
       <Box sx={{ my: 4, textAlign: 'center' }}>
         <Typography variant="h2" component="h1" gutterBottom>
-          Welcome to Our E-Commerce Platform
+          Welcome to Alex's Jersey Hub
         </Typography>
         <Typography variant="h5" color="text.secondary" paragraph>
-          Discover amazing products at great prices
+          The home for amazing jerseys at great prices
         </Typography>
         <Box sx={{ mt: 4 }}>
           <Button
