@@ -106,3 +106,8 @@ Route::middleware(['auth:sanctum', 'admin'])->prefix('admin')->group(function ()
     Route::get('/review-management/{review}', [AdminReviewController::class, 'show']);
     Route::delete('/review-management/{review}', [AdminReviewController::class, 'destroy']);
 });
+
+// Health check endpoint for Render
+Route::get('/healthz', function () {
+    return response()->json(['status' => 'ok'], 200);
+});
