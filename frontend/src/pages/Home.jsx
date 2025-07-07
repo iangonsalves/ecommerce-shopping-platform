@@ -26,7 +26,7 @@ const Home = () => {
           <Button
             component={Link}
             to="/categories"
-            variant="outlined"
+            variant="contained"
             color="primary"
             size="large"
           >

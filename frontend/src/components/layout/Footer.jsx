@@ -21,10 +21,10 @@ const Footer = () => {
         <Grid container spacing={4}>
           <Grid item xs={12} sm={4}>
             <Typography variant="h6" color="text.primary" gutterBottom>
-              E-Commerce Platform
+              Alex's Jersey Hub
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              Your one-stop shop for all your shopping needs.
+              Your one-stop shop for all your football jersey needs.
             </Typography>
           </Grid>
           <Grid item xs={12} sm={4}>
@@ -46,16 +46,16 @@ const Footer = () => {
               Contact Us
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              Email: support@ecommerce.com
+              Email: support@jerseyhub.com
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              Phone: (123) 456-7890
+              Phone: (+971) 50 153 3421
             </Typography>
           </Grid>
         </Grid>
         <Box sx={{ mt: 3, borderTop: '1px solid', borderColor: 'divider', pt: 2 }}>
           <Typography variant="body2" color="text.secondary" align="center">
-            © {currentYear} E-Commerce Platform. All rights reserved.
+            © {currentYear} Alex's Jersey Hub. All rights reserved.
           </Typography>
         </Box>
       </Container>

@@ -82,7 +82,7 @@ const AdminLayout = () => {
             <MenuIcon />
           </IconButton>
           <Typography variant="h6" noWrap component="div">
-            E-Commerce Admin
+            Alex's Jersey Hub Admin
           </Typography>
         </Toolbar>
       </AppBar>

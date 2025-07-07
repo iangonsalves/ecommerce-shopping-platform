@@ -36,7 +36,7 @@ const Navbar = () => {
             color: 'inherit'
           }}
         >
-          E-Commerce
+         Alex's Jersey Hub
         </Typography>
 
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
