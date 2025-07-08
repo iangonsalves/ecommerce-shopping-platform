@@ -42,7 +42,6 @@ const OrderManagement = () => {
       setOrders(response.data);
       setError('');
     } catch (error) {
-      console.error('Error fetching orders:', error);
       setError('Failed to fetch orders. Please try again.');
     }
   };
@@ -71,7 +70,6 @@ const OrderManagement = () => {
       fetchOrders();
       setError('');
     } catch (error) {
-      console.error('Error updating order status:', error);
       setError('Failed to update order status. Please try again.');
     } finally {
       setStatusUpdateLoading(false);
@@ -99,10 +97,7 @@ const OrderManagement = () => {
   };
 
   const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD'
-    }).format(amount);
+    return <><span className="dirham-symbol">&#xea;</span> {Number(amount).toFixed(2)}</>;
   };
 
   return (

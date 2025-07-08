@@ -45,16 +45,13 @@ const ProductManagement = () => {
   const fetchProducts = async () => {
     try {
       const response = await api.get('/admin/product-management');
-      console.log('Products API Response:', response);
       if (response.data && response.data.data) {
         setProducts(response.data.data);
         setError('');
       } else {
-        console.error('Unexpected API response structure:', response);
         setError('Invalid response format from server');
       }
     } catch (error) {
-      console.error('Error fetching products:', error.response || error);
       setError('Failed to fetch products. Please try again.');
     }
   };
@@ -62,14 +59,11 @@ const ProductManagement = () => {
   const fetchCategories = async () => {
     try {
       const response = await api.get('/admin/category-management');
-      console.log('Categories API Response:', response);
       if (response.data && response.data.data) {
         setCategories(response.data.data);
       } else {
-        console.error('Unexpected categories API response structure:', response);
       }
     } catch (error) {
-      console.error('Error fetching categories:', error.response || error);
     }
   };
 
@@ -128,7 +122,6 @@ const ProductManagement = () => {
       handleClose();
       fetchProducts();
     } catch (error) {
-      console.error('Error saving product:', error);
       setError('Failed to save product. Please try again.');
     }
   };
@@ -139,7 +132,6 @@ const ProductManagement = () => {
         await api.delete(`/admin/product-management/${id}`);
         fetchProducts();
       } catch (error) {
-        console.error('Error deleting product:', error);
         setError('Failed to delete product. Please try again.');
       }
     }
@@ -181,7 +173,9 @@ const ProductManagement = () => {
               <TableRow key={product.id}>
                 <TableCell>{product.name}</TableCell>
                 <TableCell>{product.description}</TableCell>
-                <TableCell>${product.price}</TableCell>
+                <TableCell>
+                  <span className="dirham-symbol">&#xea;</span> {Number(product.price).toFixed(2)}
+                </TableCell>
                 <TableCell>{product.stock}</TableCell>
                 <TableCell>{product.category?.name}</TableCell>
                 <TableCell>

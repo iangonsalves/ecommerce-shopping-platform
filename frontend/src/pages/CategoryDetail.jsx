@@ -30,14 +30,12 @@ const CategoryDetail = () => {
       try {
         // Fetch league details
         const leagueResponse = await api.get(`/leagues/${id}`);
-        console.log('League Response:', leagueResponse.data);
         // Handle both wrapped and unwrapped responses
         const leagueData = leagueResponse.data.data || leagueResponse.data;
         setLeague(leagueData);
 
         // Fetch clubs in this league
         const clubsResponse = await api.get(`/leagues/${id}/clubs`);
-        console.log('Clubs Response:', clubsResponse.data);
         // Handle both wrapped and unwrapped responses
         const clubsData = clubsResponse.data.data || clubsResponse.data;
         // Ensure clubs is an array

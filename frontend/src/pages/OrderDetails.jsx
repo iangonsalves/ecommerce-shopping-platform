@@ -30,7 +30,6 @@ const OrderDetails = () => {
         setOrder(response.data);
         setError('');
       } catch (error) {
-        console.error('Error fetching order:', error);
         setError('Failed to fetch order details. Please try again.');
       } finally {
         setLoading(false);
@@ -61,10 +60,7 @@ const OrderDetails = () => {
   };
 
   const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD'
-    }).format(amount);
+    return <><span className="dirham-symbol">&#xea;</span> {Number(amount).toFixed(2)}</>;
   };
 
   if (loading) {

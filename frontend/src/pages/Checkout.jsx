@@ -103,7 +103,7 @@ const PaymentForm = ({ clientSecret, setPaymentError, onPaymentSuccess, total })
         disabled={!stripe || !elements || !clientSecret || processing}
         fullWidth
       >
-        {processing ? <CircularProgress size={24} /> : `Pay $${Number(total || 0).toFixed(2)}`}
+        {processing ? <CircularProgress size={24} /> : <><span className="dirham-symbol">&#xea;</span> {Number(total || 0).toFixed(2)}</>}
       </Button>
     </form>
   );
@@ -139,7 +139,6 @@ const CheckoutContent = () => {
             setPaymentError('Could not initialize payment. Please try again.');
           }
         } catch (error) {
-          console.error("Error fetching payment intent:", error);
           setPaymentError(error.response?.data?.error || 'Failed to initialize payment system. Please refresh or try again later.');
         } finally {
           setPaymentProcessing(false);
@@ -410,7 +409,7 @@ const CheckoutContent = () => {
                       </Grid>
                       <Grid item xs={3}>
                         <Typography variant="subtitle1">
-                          ${Number(item.price * item.quantity).toFixed(2)}
+                          <span className="dirham-symbol">&#xea;</span> {Number(item.price * item.quantity).toFixed(2)}
                         </Typography>
                       </Grid>
                     </Grid>
@@ -432,7 +431,7 @@ const CheckoutContent = () => {
             <Grid container spacing={2}>
               <Grid item xs={12}>
                 <Typography variant="h5">
-                  Total: ${Number(cart?.total || 0).toFixed(2)}
+                  Total: <span className="dirham-symbol">&#xea;</span> {Number(cart?.total || 0).toFixed(2)}
                 </Typography>
               </Grid>
             </Grid>

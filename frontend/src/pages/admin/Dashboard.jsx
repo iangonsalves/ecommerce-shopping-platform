@@ -64,14 +64,11 @@ const Dashboard = () => {
       try {
         setLoading(true);
         setError(null);
-        console.log('Fetching admin stats...');
         const response = await api.get('/admin/stats');
-        console.log('Stats response:', response.data);
         if (response.data) {
           setStats(response.data);
         }
       } catch (error) {
-        console.error('Error fetching stats:', error.response?.data || error.message);
         setError(
           error.response?.data?.message || 
           'Failed to load dashboard stats. Please try again later.'

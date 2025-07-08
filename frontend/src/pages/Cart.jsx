@@ -199,7 +199,7 @@ const Cart = () => {
                 <Grid item xs={12} sm={3}>
                   <Typography variant="h6">{item.product?.name || 'Product'}</Typography>
                   <Typography variant="body2" color="text.secondary">
-                    ${Number(item.price || 0).toFixed(2)}
+                    <span className="dirham-symbol">&#xea;</span> {Number(item.price || 0).toFixed(2)}
                   </Typography>
                   {/* Display selected size if available */}
                   {item.options?.size && (
@@ -225,7 +225,7 @@ const Cart = () => {
                 </Grid>
                 <Grid item xs={12} sm={2}>
                   <Typography variant="h6">
-                    ${(item.price * (quantities[item.id] || item.quantity)).toFixed(2)}
+                    <span className="dirham-symbol">&#xea;</span> {(item.price * (quantities[item.id] || item.quantity)).toFixed(2)}
                   </Typography>
                 </Grid>
                 <Grid item xs={12} sm={1}>
@@ -245,7 +245,7 @@ const Cart = () => {
 
         <Box sx={{ mt: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <Typography variant="h5">
-            Total: ${total.toFixed(2)}
+            Total: <span className="dirham-symbol">&#xea;</span> {total.toFixed(2)}
           </Typography>
           <Button
             variant="contained"

@@ -39,7 +39,6 @@ const CategoryManagement = () => {
       setCategories(response.data.data);
       setError('');
     } catch (error) {
-      console.error('Error fetching categories:', error);
       setError('Failed to fetch categories. Please try again.');
     }
   };
@@ -90,7 +89,6 @@ const CategoryManagement = () => {
       handleClose();
       fetchCategories();
     } catch (error) {
-      console.error('Error saving category:', error);
       setError('Failed to save category. Please try again.');
     }
   };
@@ -101,7 +99,6 @@ const CategoryManagement = () => {
         await api.delete(`/admin/category-management/${id}`);
         fetchCategories();
       } catch (error) {
-        console.error('Error deleting category:', error);
         setError('Failed to delete category. Please try again.');
       }
     }

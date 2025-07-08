@@ -160,7 +160,7 @@ const ProductDetail = () => {
               </Typography>
             </Box>
             <Typography variant="h5" color="primary" gutterBottom>
-              ${product.price}
+              <span className="dirham-symbol">&#xea;</span> {Number(product.price).toFixed(2)}
             </Typography>
             <Typography variant="body1" paragraph>
               {product.description}

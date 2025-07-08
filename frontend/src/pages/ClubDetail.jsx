@@ -28,13 +28,11 @@ const ClubDetail = () => {
     const fetchClub = async () => {
       try {
         const response = await api.get(`/clubs/${id}`);
-        console.log('Club Response:', response.data);
         // Handle both wrapped and unwrapped responses
         const clubData = response.data.data || response.data;
         setClub(clubData);
         setError('');
       } catch (error) {
-        console.error('Error fetching club:', error);
         setError('Failed to load club data');
       } finally {
         setLoading(false);
@@ -102,7 +100,6 @@ const ClubDetail = () => {
             <Grid item xs={12} sm={6} md={4} key={product.id}>
               <Card>
                 <CardActionArea component={Link} to={`/products/${product.id}`}>
-                  {console.log('Image prop for CardMedia:', product.image || product.image_url || 'https://placehold.co/400x200/CCCCCC/666666?text=Product+Image')}
                   <CardMedia
                     component="img"
                     height="140"
@@ -121,7 +118,7 @@ const ClubDetail = () => {
                       {product.description}
                     </Typography>
                     <Typography variant="h6" color="primary">
-                      ${Number(product.price).toFixed(2)}
+                      <span className="dirham-symbol">&#xea;</span> {Number(product.price).toFixed(2)}
                     </Typography>
                   </CardContent>
                 </CardActionArea>

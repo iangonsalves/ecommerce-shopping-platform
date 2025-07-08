@@ -22,14 +22,11 @@ const CategoryList = () => {
     const fetchLeagues = async () => {
       try {
         const response = await api.get('/leagues');
-        console.log('API Response:', response.data);
         // Check if response.data is an array or if it's wrapped in a data property
         const leaguesData = Array.isArray(response.data) ? response.data : response.data.data || [];
-        console.log('Processed leagues data:', leaguesData);
         setLeagues(leaguesData);
       } catch (error) {
         setError('Error fetching leagues');
-        console.error('Error fetching leagues:', error);
       } finally {
         setLoading(false);
       }
@@ -60,7 +57,6 @@ const CategoryList = () => {
 
   // Add a check to ensure leagues is an array before mapping
   if (!Array.isArray(leagues)) {
-    console.error('Leagues is not an array:', leagues);
     return (
       <Container>
         <Alert severity="error" sx={{ mt: 2 }}>
