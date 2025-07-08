@@ -9,6 +9,7 @@ import {
 } from '@mui/material';
 import { useAuth } from '../../context/AuthContext';
 import CartIcon from '../common/CartIcon';
+import Tooltip from '@mui/material/Tooltip';
 
 const Navbar = () => {
   const navigate = useNavigate();
@@ -26,39 +27,48 @@ const Navbar = () => {
   return (
     <AppBar position="static">
       <Toolbar>
-        <Typography
-          variant="h6"
-          component={RouterLink}
-          to="/"
-          sx={{
-            flexGrow: 1,
-            textDecoration: 'none',
-            color: 'inherit'
-          }}
-        >
-         Alex's Jersey Hub
-        </Typography>
+        <Box sx={{ flexGrow: 1 }}>
+          <Tooltip title="Go to Home" arrow placement="bottom">
+            <Typography
+              variant="h6"
+              component={RouterLink}
+              to="/"
+              sx={{
+                textDecoration: 'none',
+                color: 'inherit',
+                width: 'fit-content',
+                display: 'inline-block'
+              }}
+            >
+              Alex's Jersey Hub
+            </Typography>
+          </Tooltip>
+        </Box>
 
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+          <Tooltip title="Browse All Jerseys" arrow>
           <Button
             color="inherit"
             component={RouterLink}
             to="/products"
           >
-            Products
+            All Jerseys
           </Button>
-
+          </Tooltip>
+          <Tooltip title="Browse Leagues" arrow>
           <Button
             color="inherit"
             component={RouterLink}
             to="/leagues"
           >
-            Categories
+            Leagues
           </Button>
+          </Tooltip>
 
           {user ? (
             <>
               <CartIcon />
+              <Tooltip title="View Profile" arrow>
               <Button
                 color="inherit"
                 component={RouterLink}
@@ -66,6 +76,8 @@ const Navbar = () => {
               >
                 Profile
               </Button>
+              </Tooltip>
+              <Tooltip title="View Orders" arrow>
               <Button
                 color="inherit"
                 component={RouterLink}
@@ -73,12 +85,15 @@ const Navbar = () => {
               >
                 Orders
               </Button>
+              </Tooltip>
+              <Tooltip title="Logout" arrow>
               <Button
                 color="inherit"
                 onClick={handleLogout}
               >
                 Logout
               </Button>
+              </Tooltip>
             </>
           ) : (
             <>

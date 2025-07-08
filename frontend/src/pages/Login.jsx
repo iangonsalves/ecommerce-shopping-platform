@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { Typography, Box, Alert } from '@mui/material';
 import { useAuth } from '../context/AuthContext';
 import PageContainer from '../components/layout/PageContainer';
@@ -15,6 +15,7 @@ const Login = () => {
   const [error, setError] = useState('');
   const { login } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleChange = useCallback((e) => {
     const { name, value } = e.target;
@@ -34,7 +35,8 @@ const Login = () => {
 
     try {
       await login(formData.email, formData.password);
-      navigate('/', { replace: true });
+      const redirectTo = location.state?.from?.pathname || '/';
+      navigate(redirectTo, { replace: true });
     } catch (err) {
       setError(err.message || 'Failed to login');
     } finally {

@@ -8,12 +8,17 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Initialize auth state from localStorage
+  // Initialize auth state from localStorage (token + user)
   useEffect(() => {
     const token = localStorage.getItem('token');
-    if (token) {
+    const userData = localStorage.getItem('user');
+    if (token && userData) {
+      setUser(JSON.parse(userData)); // Set user instantly for instant UI
       api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-      // Only fetch user data if we have a token
+      setLoading(false); 
+      checkAuth(); // Re-validate in background
+    } else if (token) {
+      api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
       checkAuth();
     } else {
       setLoading(false);
@@ -24,9 +29,11 @@ export const AuthProvider = ({ children }) => {
     try {
       const response = await api.get('/user');
       setUser(response.data);
+      localStorage.setItem('user', JSON.stringify(response.data)); // Update cache
     } catch (err) {
       console.error('Auth check error:', err);
       localStorage.removeItem('token');
+      localStorage.removeItem('user');
       delete api.defaults.headers.common['Authorization'];
       setUser(null);
     } finally {
@@ -38,12 +45,9 @@ export const AuthProvider = ({ children }) => {
     try {
       const response = await api.post('/login', { email, password });
       const { token, user } = response.data;
-      
-      // Set token and headers immediately
       localStorage.setItem('token', token);
+      localStorage.setItem('user', JSON.stringify(user)); // Save user info
       api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-      
-      // Update user state
       setUser(user);
       return user;
     } catch (err) {
@@ -56,7 +60,6 @@ export const AuthProvider = ({ children }) => {
   const register = async (name, email, password, password_confirmation) => {
     setLoading(true);
     setError(null);
-    
     try {
       const response = await api.post('/register', {
         name,
@@ -64,9 +67,9 @@ export const AuthProvider = ({ children }) => {
         password,
         password_confirmation
       });
-      
       const { token, user } = response.data;
       localStorage.setItem('token', token);
+      localStorage.setItem('user', JSON.stringify(user)); // Save user info
       api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
       setUser(user);
       return user;
@@ -86,6 +89,7 @@ export const AuthProvider = ({ children }) => {
       console.error('Logout error:', err);
     } finally {
       localStorage.removeItem('token');
+      localStorage.removeItem('user'); // Remove cached user
       delete api.defaults.headers.common['Authorization'];
       setUser(null);
     }
