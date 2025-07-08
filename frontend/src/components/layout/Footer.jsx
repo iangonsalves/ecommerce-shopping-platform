@@ -32,10 +32,10 @@ const Footer = () => {
               Quick Links
             </Typography>
             <Link component={RouterLink} to="/products" color="inherit" display="block" sx={{ mb: 1 }}>
-              Products
+              All Jerseys
             </Link>
-            <Link component={RouterLink} to="/categories" color="inherit" display="block" sx={{ mb: 1 }}>
-              Categories
+            <Link component={RouterLink} to="/leagues" color="inherit" display="block" sx={{ mb: 1 }}>
+              Leagues
             </Link>
             <Link component={RouterLink} to="/cart" color="inherit" display="block" sx={{ mb: 1 }}>
               Cart
