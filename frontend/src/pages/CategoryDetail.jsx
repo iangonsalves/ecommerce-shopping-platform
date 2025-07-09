@@ -8,14 +8,12 @@ import {
   CardContent,
   CardMedia,
   CardActionArea,
-  Button,
   Box,
   CircularProgress,
   Alert
 } from '@mui/material';
 import { Link } from 'react-router-dom';
 import api from '../services/api';
-import { useCart } from '../context/CartContext';
 
 const CategoryDetail = () => {
   const { id } = useParams();
@@ -23,7 +21,6 @@ const CategoryDetail = () => {
   const [clubs, setClubs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const { addToCart, loading: cartLoading } = useCart();
 
   useEffect(() => {
     const fetchLeagueAndClubs = async () => {
@@ -53,12 +50,19 @@ const CategoryDetail = () => {
     fetchLeagueAndClubs();
   }, [id]);
 
-  const handleAddToCart = async (productId) => {
-    const success = await addToCart(productId, 1);
-    if (success) {
-      // You could add a success message here
-    }
+  const cleanImageUrl = (url) => {
+    if (!url) return null;
+    // Remove any escaped forward slashes and ensure proper URL format
+    const cleaned = url.replace(/\\/g, '');
+    return cleaned;
   };
+
+  // Prepare clubs with cleaned image URLs
+  const clubsWithCleanImages = clubs.map(club => ({
+    ...club,
+    image: cleanImageUrl(club.image),
+    image_url: cleanImageUrl(club.image_url)
+  }));
 
   if (loading) {
     return (
@@ -92,32 +96,41 @@ const CategoryDetail = () => {
 
   return (
     <Container maxWidth="lg" sx={{ mt: 4 }}>
-      <Typography variant="h4" component="h1" gutterBottom>
-        {league.name}
-      </Typography>
-      
-      <Typography variant="body1" paragraph>
-        {league.description}
-      </Typography>
-
       {/* Display clubs in this league */}
       <Box sx={{ mt: 4 }}>
         <Typography variant="h5" gutterBottom>
           Teams in this League:
         </Typography>
-        {clubs.length === 0 ? (
+        {clubsWithCleanImages.length === 0 ? (
           <Alert severity="info">No teams found in this league</Alert>
         ) : (
           <Grid container spacing={2}>
-            {clubs.map((club) => (
+            {clubsWithCleanImages.map((club) => (
               <Grid item xs={12} sm={6} md={4} key={club.id}>
                 <Card>
                   <CardActionArea component={Link} to={`/clubs/${club.id}`}>
                     <CardMedia
                       component="img"
                       height="140"
-                      image={club.image || club.image_url || 'https://placehold.co/400x200/CCCCCC/666666?text=Club+Image'}
+                      image={club.image ?
+                        (club.image.startsWith('http://') || club.image.startsWith('https://') ?
+                          club.image :
+                          `${import.meta.env.VITE_API_BASE_URL.replace('/api', '')}/${club.image}`)
+                        : (club.image_url ?
+                          (club.image_url.startsWith('http://') || club.image_url.startsWith('https://') ?
+                            club.image_url :
+                            `${import.meta.env.VITE_API_BASE_URL.replace('/api', '')}/${club.image_url}`)
+                          : 'https://placehold.co/400x200/CCCCCC/666666?text=Club+Image')}
                       alt={club.name}
+                      sx={{
+                        objectFit: 'contain',
+                        width: '100%',
+                        height: 200,
+                        background: '#181818',
+                        borderTopLeftRadius: '16px',
+                        borderTopRightRadius: '16px',
+                        p: 0
+                      }}
                     />
                     <CardContent>
                       <Typography variant="h6" component="div">

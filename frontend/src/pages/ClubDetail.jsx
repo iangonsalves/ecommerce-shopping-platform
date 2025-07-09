@@ -109,6 +109,15 @@ const ClubDetail = () => {
                         `${import.meta.env.VITE_API_BASE_URL.replace('/api', '')}/${product.image || product.image_url}`)
                       : 'https://placehold.co/400x300/CCCCCC/666666?text=Product+Image'}
                     alt={product.name}
+                    sx={{
+                      objectFit: 'contain',
+                      width: '100%',
+                      height: 200,
+                      background: '#232323',
+                      borderTopLeftRadius: '16px',
+                      borderTopRightRadius: '16px',
+                      p: 0
+                    }}
                   />
                   <CardContent>
                     <Typography gutterBottom variant="h5" component="div">

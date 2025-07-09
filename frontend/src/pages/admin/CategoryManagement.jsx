@@ -30,7 +30,8 @@ const CategoryManagement = () => {
   const [error, setError] = useState('');
   const [formData, setFormData] = useState({
     name: '',
-    description: ''
+    description: '',
+    image: ''
   });
 
   const fetchCategories = async () => {
@@ -52,13 +53,15 @@ const CategoryManagement = () => {
       setSelectedCategory(category);
       setFormData({
         name: category.name,
-        description: category.description || ''
+        description: category.description || '',
+        image: category.image || ''
       });
     } else {
       setSelectedCategory(null);
       setFormData({
         name: '',
-        description: ''
+        description: '',
+        image: ''
       });
     }
     setOpen(true);
@@ -174,6 +177,14 @@ const CategoryManagement = () => {
               multiline
               rows={4}
               value={formData.description}
+              onChange={handleChange}
+            />
+            <TextField
+              margin="dense"
+              name="image"
+              label="Image URL"
+              fullWidth
+              value={formData.image}
               onChange={handleChange}
             />
           </DialogContent>

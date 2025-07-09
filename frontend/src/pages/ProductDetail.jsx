@@ -146,7 +146,8 @@ const ProductDetail = () => {
                   `${import.meta.env.VITE_API_BASE_URL.replace('/api', '')}/${product.image || product.image_url}`)
                 : 'https://placehold.co/400x300/CCCCCC/666666?text=Product+Image'}
               alt={product.name}
-              style={{ width: '100%', height: 'auto', maxHeight: '400px', objectFit: 'contain' }}
+              style={{ width: '100%', height: 'auto', maxHeight: '400px', objectFit: 'contain', background: '#fff', borderRadius: '16px',
+                p: 0 }}
             />
           </Grid>
           <Grid item xs={12} md={6}>

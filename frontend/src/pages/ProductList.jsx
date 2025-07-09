@@ -99,7 +99,15 @@ const ProductList = () => {
                     `${import.meta.env.VITE_API_BASE_URL.replace('/api', '')}/${product.image}`)
                   : 'https://placehold.co/400x300/CCCCCC/666666?text=Product+Image'}
                 alt={product.name}
-                sx={{ objectFit: 'contain', p: 2 }}
+                sx={{
+                      objectFit: 'contain',
+                      width: '100%',
+                      height: 200,
+                      background: '#fff',
+                      borderTopLeftRadius: '16px',
+                      borderTopRightRadius: '16px',
+                      p: 0
+                    }}
               />
               <CardContent sx={{ flexGrow: 1 }}>
                 <Typography gutterBottom variant="h5" component="h2">
