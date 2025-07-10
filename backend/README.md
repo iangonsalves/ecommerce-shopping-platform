@@ -1,6 +1,6 @@
-# E-commerce Platform Backend
+# Alex's Jersey Hub Platform Backend
 
-Laravel-based REST API backend for the e-commerce platform.
+Laravel-based REST API backend for Alex's Jersey Hub Platform.
 
 ## Features
 
@@ -12,7 +12,7 @@ Laravel-based REST API backend for the e-commerce platform.
 
 ### Products
 - Product CRUD operations
-- Product categorization
+- Product categorization (assign to clubs, which are subcategories of leagues)
 - Product search and filtering
 - Image handling
 
@@ -28,10 +28,10 @@ Laravel-based REST API backend for the e-commerce platform.
 - Order status management
 - Shipping information handling
 
-### Categories
-- Category management
+### Categories (Leagues & Clubs)
+- Nested category management (leagues as top-level, clubs as subcategories)
 - Product-category relationships
-- Nested category support
+- Set parent_id to assign a club to a league
 
 ## Project Structure
 
@@ -79,13 +79,17 @@ For local development, product images are stored in the `backend/public/images` 
 - description
 - price
 - image
-- category_id
+- category_id (must be a club's id)
+- size_variations (JSON)
+- stock
 - timestamps
 
 ### Categories
 - id
 - name
 - description
+- parent_id (null for leagues, set for clubs)
+- image
 - timestamps
 
 ### Carts
@@ -140,12 +144,12 @@ PUT    /api/products/{id}      - Update product (admin)
 DELETE /api/products/{id}      - Delete product (admin)
 ```
 
-### Categories
+### Categories (Leagues & Clubs)
 ```
-GET    /api/categories         - List all categories
+GET    /api/categories         - List all categories (leagues and clubs)
 GET    /api/categories/{id}    - Get category details
-POST   /api/categories         - Create category (admin)
-PUT    /api/categories/{id}    - Update category (admin)
+POST   /api/categories         - Create category (admin, set parent_id for clubs)
+PUT    /api/categories/{id}    - Update category (admin, set parent_id for clubs)
 DELETE /api/categories/{id}    - Delete category (admin)
 ```
 
@@ -171,7 +175,7 @@ Install dependencies:
 composer install
 ```
 
-2. Configure environment:
+Configure environment:
 ```bash
 cp .env.example .env
 # Configure database credentials
@@ -205,13 +209,4 @@ HTTP Status Codes:
 - 403: Forbidden
 - 404: Not Found
 - 422: Validation Error
-- 500: Server Error
-
-## Security
-
-- JWT authentication required for protected routes
-- Input validation on all endpoints
-- CORS configuration
-- Rate limiting on authentication endpoints
-- SQL injection protection
-- XSS protection
+- 500: Internal Server Error
