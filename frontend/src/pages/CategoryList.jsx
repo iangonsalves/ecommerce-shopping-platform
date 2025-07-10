@@ -18,18 +18,27 @@ const CategoryList = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
+  const cleanImageUrl = (url) => {
+    if (!url) return null;
+    // Remove any escaped forward slashes and ensure proper URL format
+    const cleaned = url.replace(/\\/g, '');
+    return cleaned;
+  };
+
   useEffect(() => {
     const fetchLeagues = async () => {
       try {
         const response = await api.get('/leagues');
-        console.log('API Response:', response.data);
         // Check if response.data is an array or if it's wrapped in a data property
         const leaguesData = Array.isArray(response.data) ? response.data : response.data.data || [];
-        console.log('Processed leagues data:', leaguesData);
-        setLeagues(leaguesData);
+        // Clean image URLs in the response
+        const cleanedLeagues = leaguesData.map(league => ({
+          ...league,
+          image: cleanImageUrl(league.image)
+        }));
+        setLeagues(cleanedLeagues);
       } catch (error) {
         setError('Error fetching leagues');
-        console.error('Error fetching leagues:', error);
       } finally {
         setLoading(false);
       }
@@ -60,7 +69,6 @@ const CategoryList = () => {
 
   // Add a check to ensure leagues is an array before mapping
   if (!Array.isArray(leagues)) {
-    console.error('Leagues is not an array:', leagues);
     return (
       <Container>
         <Alert severity="error" sx={{ mt: 2 }}>
@@ -101,9 +109,21 @@ const CategoryList = () => {
                 <CardMedia
                   component="img"
                   height="200"
-                  image="https://placehold.co/400x200/CCCCCC/666666?text=League+Image"
+                  image={league.image ?
+                    (league.image.startsWith('http://') || league.image.startsWith('https://') ?
+                      league.image :
+                      `${import.meta.env.VITE_API_BASE_URL.replace('/api', '')}/${league.image}`)
+                    : 'https://placehold.co/400x200/CCCCCC/666666?text=League+Image'}
                   alt={league.name}
-                  sx={{ objectFit: 'cover' }}
+                  sx={{
+                    objectFit: 'contain',
+                    width: '100%',
+                    height: 200,
+                    background: '#e0e0e0',
+                    borderTopLeftRadius: '16px',
+                    borderTopRightRadius: '16px',
+                    p: 0
+                  }}
                 />
                 <CardContent sx={{ flexGrow: 1 }}>
                   <Typography gutterBottom variant="h5" component="h2">

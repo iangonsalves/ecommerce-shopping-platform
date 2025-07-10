@@ -28,13 +28,11 @@ const ClubDetail = () => {
     const fetchClub = async () => {
       try {
         const response = await api.get(`/clubs/${id}`);
-        console.log('Club Response:', response.data);
         // Handle both wrapped and unwrapped responses
         const clubData = response.data.data || response.data;
         setClub(clubData);
         setError('');
       } catch (error) {
-        console.error('Error fetching club:', error);
         setError('Failed to load club data');
       } finally {
         setLoading(false);
@@ -102,7 +100,6 @@ const ClubDetail = () => {
             <Grid item xs={12} sm={6} md={4} key={product.id}>
               <Card>
                 <CardActionArea component={Link} to={`/products/${product.id}`}>
-                  {console.log('Image prop for CardMedia:', product.image || product.image_url || 'https://placehold.co/400x200/CCCCCC/666666?text=Product+Image')}
                   <CardMedia
                     component="img"
                     height="140"
@@ -112,6 +109,15 @@ const ClubDetail = () => {
                         `${import.meta.env.VITE_API_BASE_URL.replace('/api', '')}/${product.image || product.image_url}`)
                       : 'https://placehold.co/400x300/CCCCCC/666666?text=Product+Image'}
                     alt={product.name}
+                    sx={{
+                      objectFit: 'contain',
+                      width: '100%',
+                      height: 200,
+                      background: '#232323',
+                      borderTopLeftRadius: '16px',
+                      borderTopRightRadius: '16px',
+                      p: 0
+                    }}
                   />
                   <CardContent>
                     <Typography gutterBottom variant="h5" component="div">
@@ -121,7 +127,7 @@ const ClubDetail = () => {
                       {product.description}
                     </Typography>
                     <Typography variant="h6" color="primary">
-                      ${Number(product.price).toFixed(2)}
+                      <span className="dirham-symbol">&#xea;</span> {Number(product.price).toFixed(2)}
                     </Typography>
                   </CardContent>
                 </CardActionArea>

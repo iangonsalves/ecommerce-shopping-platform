@@ -16,7 +16,11 @@ import {
   Paper,
   IconButton,
   Typography,
-  Alert
+  Alert,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -30,7 +34,9 @@ const CategoryManagement = () => {
   const [error, setError] = useState('');
   const [formData, setFormData] = useState({
     name: '',
-    description: ''
+    description: '',
+    image: '',
+    parent_id: ''
   });
 
   const fetchCategories = async () => {
@@ -39,7 +45,6 @@ const CategoryManagement = () => {
       setCategories(response.data.data);
       setError('');
     } catch (error) {
-      console.error('Error fetching categories:', error);
       setError('Failed to fetch categories. Please try again.');
     }
   };
@@ -53,13 +58,17 @@ const CategoryManagement = () => {
       setSelectedCategory(category);
       setFormData({
         name: category.name,
-        description: category.description || ''
+        description: category.description || '',
+        image: category.image || '',
+        parent_id: category.parent_id || ''
       });
     } else {
       setSelectedCategory(null);
       setFormData({
         name: '',
-        description: ''
+        description: '',
+        image: '',
+        parent_id: ''
       });
     }
     setOpen(true);
@@ -90,7 +99,6 @@ const CategoryManagement = () => {
       handleClose();
       fetchCategories();
     } catch (error) {
-      console.error('Error saving category:', error);
       setError('Failed to save category. Please try again.');
     }
   };
@@ -101,7 +109,6 @@ const CategoryManagement = () => {
         await api.delete(`/admin/category-management/${id}`);
         fetchCategories();
       } catch (error) {
-        console.error('Error deleting category:', error);
         setError('Failed to delete category. Please try again.');
       }
     }
@@ -132,6 +139,7 @@ const CategoryManagement = () => {
             <TableRow>
               <TableCell>Name</TableCell>
               <TableCell>Description</TableCell>
+              <TableCell>League</TableCell>
               <TableCell>Actions</TableCell>
             </TableRow>
           </TableHead>
@@ -140,6 +148,11 @@ const CategoryManagement = () => {
               <TableRow key={category.id}>
                 <TableCell>{category.name}</TableCell>
                 <TableCell>{category.description}</TableCell>
+                <TableCell>
+                  {category.parent_id
+                    ? (categories.find(cat => cat.id === category.parent_id)?.name || category.parent_id)
+                    : '—'}
+                </TableCell>
                 <TableCell>
                   <IconButton onClick={() => handleOpen(category)} color="primary">
                     <EditIcon />
@@ -179,6 +192,32 @@ const CategoryManagement = () => {
               value={formData.description}
               onChange={handleChange}
             />
+            <TextField
+              margin="dense"
+              name="image"
+              label="Image URL"
+              fullWidth
+              value={formData.image}
+              onChange={handleChange}
+            />
+            <FormControl fullWidth margin="dense">
+              <InputLabel>League</InputLabel>
+              <Select
+                name="parent_id"
+                value={formData.parent_id || ''}
+                onChange={handleChange}
+                label="League"
+              >
+                <MenuItem value="">None</MenuItem>
+                {categories
+                  .filter(cat => !cat.parent_id)
+                  .map(cat => (
+                    <MenuItem key={cat.id} value={cat.id}>
+                      {cat.name}
+                    </MenuItem>
+                  ))}
+              </Select>
+            </FormControl>
           </DialogContent>
           <DialogActions>
             <Button onClick={handleClose}>Cancel</Button>

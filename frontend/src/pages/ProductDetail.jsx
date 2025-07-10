@@ -146,7 +146,8 @@ const ProductDetail = () => {
                   `${import.meta.env.VITE_API_BASE_URL.replace('/api', '')}/${product.image || product.image_url}`)
                 : 'https://placehold.co/400x300/CCCCCC/666666?text=Product+Image'}
               alt={product.name}
-              style={{ width: '100%', height: 'auto', maxHeight: '400px', objectFit: 'contain' }}
+              style={{ width: '100%', height: 'auto', maxHeight: '400px', objectFit: 'contain', background: '#fff', borderRadius: '16px',
+                p: 0 }}
             />
           </Grid>
           <Grid item xs={12} md={6}>
@@ -154,13 +155,18 @@ const ProductDetail = () => {
               {product.name}
             </Typography>
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-              <Rating value={product.average_rating} precision={0.5} readOnly />
-              <Typography variant="body2" sx={{ ml: 1 }}>
+              <Typography variant="body1" sx={{ fontWeight: 600, mr: 1 }}>
+                {Number.isFinite(Number(product.average_rating))
+                  ? Number(product.average_rating).toFixed(1)
+                  : '0.0'}
+              </Typography>
+              <Rating value={product.average_rating} precision={0.5} readOnly sx={{ mr: 1 }} />
+              <Typography variant="body2">
                 ({product.reviews_count} reviews)
               </Typography>
             </Box>
             <Typography variant="h5" color="primary" gutterBottom>
-              ${product.price}
+              <span className="dirham-symbol">&#xea;</span> {Number(product.price).toFixed(2)}
             </Typography>
             <Typography variant="body1" paragraph>
               {product.description}

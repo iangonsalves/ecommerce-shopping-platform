@@ -73,8 +73,6 @@ export const CartProvider = ({ children }) => {
         payload.options = selectedSize ? { size: selectedSize } : null;
       }
 
-      console.log('Adding to cart with payload:', payload); // Debug log
-
       const response = await api.post('/cart/items', payload);
       
       if (response.data && response.data.cart) {
@@ -85,7 +83,7 @@ export const CartProvider = ({ children }) => {
       return false;
     } catch (err) {
       console.error('Error adding to cart:', err);
-      console.error('Error response:', err.response?.data); // Debug log
+      console.error('Error response:', err.response?.data);
       if (err.response?.status === 401) {
         setError('Please log in to add items to your cart');
       } else {

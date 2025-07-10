@@ -33,7 +33,7 @@ const OrderSuccess = () => {
         const response = await api.get(`/orders/${orderId}`);
         setOrder(response.data);
       } catch (error) {
-        console.error('Error fetching order details:', error);
+        // console.error('Error fetching order details:', error);
       } finally {  
         setLoading(false);
       }
@@ -107,7 +107,7 @@ const OrderSuccess = () => {
           <ListItem>
             <ListItemText 
               primary="Total Amount" 
-              secondary={`$${Number(order.total || 0).toFixed(2)}`} 
+              secondary={<><span className="dirham-symbol">&#xea;</span> {Number(order.total || 0).toFixed(2)}</>} 
             />
           </ListItem>
           <ListItem>

@@ -1,3 +1,10 @@
+@font-face {
+  font-family: 'UAESymbol';
+  src: url('/fonts/uae.symbol.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
 :root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
@@ -32,6 +39,8 @@ html, body, #root {
 body {
   display: flex;
   flex-direction: column;
+  /* Subtle football pitch-inspired background */
+  background: #181818;
 }
 
 #root {
@@ -64,15 +73,91 @@ button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
+/* Card styling: green border and shadow */
+.MuiPaper-root {
+  background-color: #232323 !important;
+  border-radius: 14px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.4) !important;
+}
+
+/* Section headers: green underline */
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Bebas Neue', 'Oswald', Arial, sans-serif;
+  font-weight: 700;
+  color: #e0e0e0;
+  border-bottom: 3px solid #1db954;
+  display: inline-block;
+  padding-bottom: 6px;
+  margin-bottom: 20px;
+  letter-spacing: 1px;
+}
+
+/* Add to Cart and primary buttons: yellow background, green text */
+.MuiButton-containedPrimary {
+  background-color: #1db954 !important;
+  color: #181818 !important;
+  font-weight: bold;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+.MuiButton-containedPrimary:hover {
+  background-color: #17a44b !important;
+}
+
+/* Secondary buttons: green background, white text */
+.MuiButton-containedSecondary {
+  background-color: #ffd600 !important;
+  color: #181818 !important;
+  font-weight: bold;
+}
+.MuiButton-containedSecondary:hover {
+  background-color: #ffe066 !important;
+}
+
+/* Footer styles for dark mode */
+footer, .MuiBox-root[component="footer"], .MuiContainer-root footer, .MuiContainer-root .MuiBox-root[component="footer"] {
+  background: #181818 !important;
+  color: #e0e0e0 !important;
+}
+footer a, .MuiBox-root[component="footer"] a {
+  color: #cccccc !important;
+}
+footer a:hover, .MuiBox-root[component="footer"] a:hover {
+  color: #1db954 !important;
+}
+footer .MuiTypography-body2, .MuiBox-root[component="footer"] .MuiTypography-body2 {
+  color: #cccccc !important;
+}
+footer .MuiTypography-h6, .MuiBox-root[component="footer"] .MuiTypography-h6 {
+  color: #fff !important;
+}
+
+/* Homepage and section headings: strong black for contrast */
+h1, h2, h3, h4, h5, h6,
+.MuiTypography-h1, .MuiTypography-h2, .MuiTypography-h3, .MuiTypography-h4, .MuiTypography-h5, .MuiTypography-h6 {
+  color: #111 !important;
+}
+
+/* Section/paragraph/secondary text: darker gray for readability */
+.MuiTypography-body2, .MuiTypography-body1, .MuiTypography-subtitle1, .MuiTypography-subtitle2 {
+  color: #444 !important;
+}
+
+/* All card text: white for visibility */
+.MuiPaper-root .MuiTypography-root,
+.MuiCard-root .MuiTypography-root {
+  color: #fff !important;
+}
+
+/* Website name in Navbar: white */
+.MuiAppBar-root .MuiTypography-h6 {
+  color: #fff !important;
+}
+
+.dirham-symbol {
+  font-family: 'UAESymbol', sans-serif;
+  font-size: 1.1em;
+  font-weight: bold;
+  margin-right: 4px;
+  vertical-align: middle;
+  color: inherit;
 }

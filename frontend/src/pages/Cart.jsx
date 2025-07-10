@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import {
   Container,
   Typography,
@@ -197,16 +198,28 @@ const Cart = () => {
                   />
                 </Grid>
                 <Grid item xs={12} sm={3}>
-                  <Typography variant="h6">{item.product?.name || 'Product'}</Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    ${Number(item.price || 0).toFixed(2)}
+                  <Typography variant="h6">
+                    {item.product?.id ? (
+                      <Link to={`/products/${item.product.id}`} style={{ color: 'inherit', textDecoration: 'none' }}>
+                        {item.product.name}
+                      </Link>
+                    ) : (
+                      item.product?.name || 'Product'
+                    )}
                   </Typography>
-                  {/* Display selected size if available */}
-                  {item.options?.size && (
-                    <Typography variant="body2" color="text.secondary">
+                  <Typography variant="body2" color="text.secondary">
+                    <span className="dirham-symbol">&#xea;</span> {Number(item.price || 0).toFixed(2)}
+                  </Typography>
+                  {/* Display selected size if available, or fallback if product has sizes */}
+                  {item.options?.size ? (
+                    <Typography variant="body1" color="primary" sx={{ fontWeight: 600 }}>
                       Size: {item.options.size}
                     </Typography>
-                  )}
+                  ) : (Array.isArray(item.product?.size_variations) && item.product.size_variations.length > 0) || (typeof item.product?.size_variations === 'string' && item.product.size_variations.length > 0) ? (
+                    <Typography variant="body2" color="error">
+                      Size: <em>Not selected</em>
+                    </Typography>
+                  ) : null}
                 </Grid>
                 <Grid item xs={12} sm={3}>
                   <TextField
@@ -225,7 +238,7 @@ const Cart = () => {
                 </Grid>
                 <Grid item xs={12} sm={2}>
                   <Typography variant="h6">
-                    ${(item.price * (quantities[item.id] || item.quantity)).toFixed(2)}
+                    <span className="dirham-symbol">&#xea;</span> {(item.price * (quantities[item.id] || item.quantity)).toFixed(2)}
                   </Typography>
                 </Grid>
                 <Grid item xs={12} sm={1}>
@@ -245,7 +258,7 @@ const Cart = () => {
 
         <Box sx={{ mt: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <Typography variant="h5">
-            Total: ${total.toFixed(2)}
+            Total: <span className="dirham-symbol">&#xea;</span> {total.toFixed(2)}
           </Typography>
           <Button
             variant="contained"

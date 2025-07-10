@@ -35,7 +35,6 @@ const ReviewManagement = () => {
       setReviews(response.data);
       setError('');
     } catch (error) {
-      console.error('Error fetching reviews:', error);
       setError('Failed to fetch reviews. Please try again.');
     }
   };
@@ -60,7 +59,6 @@ const ReviewManagement = () => {
         await api.delete(`/admin/review-management/${reviewId}`);
         fetchReviews();
       } catch (error) {
-        console.error('Error deleting review:', error);
         setError('Failed to delete review. Please try again.');
       }
     }

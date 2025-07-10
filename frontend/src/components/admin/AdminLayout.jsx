@@ -22,6 +22,8 @@ import ReceiptIcon from '@mui/icons-material/Receipt';
 import MenuIcon from '@mui/icons-material/Menu';
 import RateReviewIcon from '@mui/icons-material/RateReview';
 import { useState } from 'react';
+import HomeIcon from '@mui/icons-material/Home';
+import Tooltip from '@mui/material/Tooltip';
 
 const drawerWidth = 240;
 
@@ -52,10 +54,12 @@ const AdminLayout = () => {
       <List>
         {menuItems.map((item) => (
           <ListItem key={item.text} disablePadding>
-            <ListItemButton component={RouterLink} to={item.path}>
-              <ListItemIcon>{item.icon}</ListItemIcon>
-              <ListItemText primary={item.text} />
-            </ListItemButton>
+            <Tooltip title={item.text} placement="right" arrow>
+              <ListItemButton component={RouterLink} to={item.path}>
+                <ListItemIcon>{item.icon}</ListItemIcon>
+                <ListItemText primary={item.text} />
+              </ListItemButton>
+            </Tooltip>
           </ListItem>
         ))}
       </List>
@@ -72,6 +76,17 @@ const AdminLayout = () => {
         }}
       >
         <Toolbar>
+          <Tooltip title="Go to Home">
+            <IconButton
+              color="inherit"
+              component={RouterLink}
+              to="/"
+              edge="start"
+              sx={{ mr: 2 }}
+            >
+              <HomeIcon />
+            </IconButton>
+          </Tooltip>
           <IconButton
             color="inherit"
             aria-label="open drawer"
@@ -82,7 +97,7 @@ const AdminLayout = () => {
             <MenuIcon />
           </IconButton>
           <Typography variant="h6" noWrap component="div">
-            E-Commerce Admin
+            Alex's Jersey Hub Admin
           </Typography>
         </Toolbar>
       </AppBar>

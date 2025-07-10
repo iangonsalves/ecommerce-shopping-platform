@@ -39,22 +39,20 @@ const ProductManagement = () => {
     price: '',
     stock: '',
     category_id: '',
-    image: ''
+    image: '',
+    sizes: ''
   });
 
   const fetchProducts = async () => {
     try {
       const response = await api.get('/admin/product-management');
-      console.log('Products API Response:', response);
       if (response.data && response.data.data) {
         setProducts(response.data.data);
         setError('');
       } else {
-        console.error('Unexpected API response structure:', response);
         setError('Invalid response format from server');
       }
     } catch (error) {
-      console.error('Error fetching products:', error.response || error);
       setError('Failed to fetch products. Please try again.');
     }
   };
@@ -62,14 +60,11 @@ const ProductManagement = () => {
   const fetchCategories = async () => {
     try {
       const response = await api.get('/admin/category-management');
-      console.log('Categories API Response:', response);
       if (response.data && response.data.data) {
         setCategories(response.data.data);
-      } else {
-        console.error('Unexpected categories API response structure:', response);
       }
     } catch (error) {
-      console.error('Error fetching categories:', error.response || error);
+      setError('Failed to fetch categories. Please try again.');
     }
   };
 
@@ -80,6 +75,21 @@ const ProductManagement = () => {
 
   const handleOpen = (product = null) => {
     if (product) {
+      let sizes = '';
+      if (Array.isArray(product.size_variations)) {
+        sizes = product.size_variations.join(', ');
+      } else if (typeof product.size_variations === 'string') {
+        try {
+          const arr = JSON.parse(product.size_variations);
+          if (Array.isArray(arr)) {
+            sizes = arr.join(', ');
+          } else {
+            sizes = product.size_variations;
+          }
+        } catch {
+          sizes = product.size_variations;
+        }
+      }
       setSelectedProduct(product);
       setFormData({
         name: product.name,
@@ -87,7 +97,8 @@ const ProductManagement = () => {
         price: product.price,
         stock: product.stock,
         category_id: product.category_id,
-        image: product.image || ''
+        image: product.image || '',
+        sizes
       });
     } else {
       setSelectedProduct(null);
@@ -97,7 +108,8 @@ const ProductManagement = () => {
         price: '',
         stock: '',
         category_id: '',
-        image: ''
+        image: '',
+        sizes: ''
       });
     }
     setOpen(true);
@@ -120,15 +132,22 @@ const ProductManagement = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      const payload = {
+        ...formData,
+        size_variations: formData.sizes
+          .split(',')
+          .map(s => s.trim())
+          .filter(s => s)
+      };
+      delete payload.sizes;
       if (selectedProduct) {
-        await api.put(`/admin/product-management/${selectedProduct.id}`, formData);
+        await api.put(`/admin/product-management/${selectedProduct.id}`, payload);
       } else {
-        await api.post('/admin/product-management', formData);
+        await api.post('/admin/product-management', payload);
       }
       handleClose();
       fetchProducts();
     } catch (error) {
-      console.error('Error saving product:', error);
       setError('Failed to save product. Please try again.');
     }
   };
@@ -139,7 +158,6 @@ const ProductManagement = () => {
         await api.delete(`/admin/product-management/${id}`);
         fetchProducts();
       } catch (error) {
-        console.error('Error deleting product:', error);
         setError('Failed to delete product. Please try again.');
       }
     }
@@ -170,30 +188,56 @@ const ProductManagement = () => {
             <TableRow>
               <TableCell>Name</TableCell>
               <TableCell>Description</TableCell>
+              <TableCell>Sizes</TableCell>
               <TableCell>Price</TableCell>
               <TableCell>Stock</TableCell>
-              <TableCell>Category</TableCell>
+              <TableCell>Club</TableCell>
+              <TableCell>League</TableCell>
               <TableCell>Actions</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {products.map((product) => (
-              <TableRow key={product.id}>
-                <TableCell>{product.name}</TableCell>
-                <TableCell>{product.description}</TableCell>
-                <TableCell>${product.price}</TableCell>
-                <TableCell>{product.stock}</TableCell>
-                <TableCell>{product.category?.name}</TableCell>
-                <TableCell>
-                  <IconButton onClick={() => handleOpen(product)} color="primary">
-                    <EditIcon />
-                  </IconButton>
-                  <IconButton onClick={() => handleDelete(product.id)} color="error">
-                    <DeleteIcon />
-                  </IconButton>
-                </TableCell>
-              </TableRow>
-            ))}
+            {products.map((product) => {
+              const club = product.category;
+              const league = categories.find(cat => cat.id === club?.parent_id);
+              return (
+                <TableRow key={product.id}>
+                  <TableCell>{product.name}</TableCell>
+                  <TableCell>{product.description}</TableCell>
+                  <TableCell>{(() => {
+                    let sizes = product.size_variations;
+                    if (Array.isArray(sizes)) {
+                      return sizes.join(', ');
+                    } else if (typeof sizes === 'string') {
+                      try {
+                        const arr = JSON.parse(sizes);
+                        if (Array.isArray(arr)) {
+                          return arr.join(', ');
+                        }
+                        return sizes;
+                      } catch {
+                        return sizes;
+                      }
+                    }
+                    return '—';
+                  })()}</TableCell>
+                  <TableCell>
+                    <span className="dirham-symbol">&#xea;</span> {Number(product.price).toFixed(2)}
+                  </TableCell>
+                  <TableCell>{product.stock}</TableCell>
+                  <TableCell>{club?.name || '—'}</TableCell>
+                  <TableCell>{league ? league.name : '—'}</TableCell>
+                  <TableCell>
+                    <IconButton onClick={() => handleOpen(product)} color="primary">
+                      <EditIcon />
+                    </IconButton>
+                    <IconButton onClick={() => handleDelete(product.id)} color="error">
+                      <DeleteIcon />
+                    </IconButton>
+                  </TableCell>
+                </TableRow>
+              );
+            })}
           </TableBody>
         </Table>
       </TableContainer>
@@ -245,19 +289,24 @@ const ProductManagement = () => {
               required
             />
             <FormControl fullWidth margin="dense">
-              <InputLabel>Category</InputLabel>
+              <InputLabel>Club</InputLabel>
               <Select
                 name="category_id"
                 value={formData.category_id}
                 onChange={handleChange}
                 required
-                label="Category"
+                label="Club"
               >
-                {categories.map((category) => (
-                  <MenuItem key={category.id} value={category.id}>
-                    {category.name}
-                  </MenuItem>
-                ))}
+                {categories
+                  .filter(cat => cat.parent_id) // Only clubs
+                  .map(club => {
+                    const league = categories.find(cat2 => cat2.id === club.parent_id);
+                    return (
+                      <MenuItem key={club.id} value={club.id}>
+                        {club.name} {league ? `(${league.name})` : ''}
+                      </MenuItem>
+                    );
+                  })}
               </Select>
             </FormControl>
             <TextField
@@ -267,6 +316,15 @@ const ProductManagement = () => {
               fullWidth
               value={formData.image}
               onChange={handleChange}
+            />
+            <TextField
+              margin="dense"
+              name="sizes"
+              label="Sizes (comma separated, e.g. S, M, L)"
+              fullWidth
+              value={formData.sizes}
+              onChange={handleChange}
+              helperText="Enter sizes separated by commas. Leave blank if not applicable."
             />
           </DialogContent>
           <DialogActions>
