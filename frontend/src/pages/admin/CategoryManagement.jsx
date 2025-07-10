@@ -16,7 +16,11 @@ import {
   Paper,
   IconButton,
   Typography,
-  Alert
+  Alert,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -31,7 +35,8 @@ const CategoryManagement = () => {
   const [formData, setFormData] = useState({
     name: '',
     description: '',
-    image: ''
+    image: '',
+    parent_id: ''
   });
 
   const fetchCategories = async () => {
@@ -54,14 +59,16 @@ const CategoryManagement = () => {
       setFormData({
         name: category.name,
         description: category.description || '',
-        image: category.image || ''
+        image: category.image || '',
+        parent_id: category.parent_id || ''
       });
     } else {
       setSelectedCategory(null);
       setFormData({
         name: '',
         description: '',
-        image: ''
+        image: '',
+        parent_id: ''
       });
     }
     setOpen(true);
@@ -132,6 +139,7 @@ const CategoryManagement = () => {
             <TableRow>
               <TableCell>Name</TableCell>
               <TableCell>Description</TableCell>
+              <TableCell>League</TableCell>
               <TableCell>Actions</TableCell>
             </TableRow>
           </TableHead>
@@ -140,6 +148,11 @@ const CategoryManagement = () => {
               <TableRow key={category.id}>
                 <TableCell>{category.name}</TableCell>
                 <TableCell>{category.description}</TableCell>
+                <TableCell>
+                  {category.parent_id
+                    ? (categories.find(cat => cat.id === category.parent_id)?.name || category.parent_id)
+                    : '—'}
+                </TableCell>
                 <TableCell>
                   <IconButton onClick={() => handleOpen(category)} color="primary">
                     <EditIcon />
@@ -187,6 +200,24 @@ const CategoryManagement = () => {
               value={formData.image}
               onChange={handleChange}
             />
+            <FormControl fullWidth margin="dense">
+              <InputLabel>League</InputLabel>
+              <Select
+                name="parent_id"
+                value={formData.parent_id || ''}
+                onChange={handleChange}
+                label="League"
+              >
+                <MenuItem value="">None</MenuItem>
+                {categories
+                  .filter(cat => !cat.parent_id)
+                  .map(cat => (
+                    <MenuItem key={cat.id} value={cat.id}>
+                      {cat.name}
+                    </MenuItem>
+                  ))}
+              </Select>
+            </FormControl>
           </DialogContent>
           <DialogActions>
             <Button onClick={handleClose}>Cancel</Button>

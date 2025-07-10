@@ -24,6 +24,7 @@ class ProductController extends Controller
             'stock' => 'required|integer|min:0',
             'category_id' => 'required|exists:categories,id',
             'image' => 'nullable|string',
+            'size_variations' => 'nullable|array',
         ]);
 
         $product = Product::create($validated);
@@ -39,6 +40,7 @@ class ProductController extends Controller
             'stock' => 'required|integer|min:0',
             'category_id' => 'required|exists:categories,id',
             'image' => 'nullable|string',
+            'size_variations' => 'nullable|array',
         ]);
 
         $product->update($validated);

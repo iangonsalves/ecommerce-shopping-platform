@@ -155,8 +155,13 @@ const ProductDetail = () => {
               {product.name}
             </Typography>
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-              <Rating value={product.average_rating} precision={0.5} readOnly />
-              <Typography variant="body2" sx={{ ml: 1 }}>
+              <Typography variant="body1" sx={{ fontWeight: 600, mr: 1 }}>
+                {Number.isFinite(Number(product.average_rating))
+                  ? Number(product.average_rating).toFixed(1)
+                  : '0.0'}
+              </Typography>
+              <Rating value={product.average_rating} precision={0.5} readOnly sx={{ mr: 1 }} />
+              <Typography variant="body2">
                 ({product.reviews_count} reviews)
               </Typography>
             </Box>

@@ -52,6 +52,7 @@ class ProductController extends Controller
             'stock' => 'required|integer|min:0',
             'image' => 'nullable|string',
             'category_id' => 'nullable|exists:categories,id',
+            'size_variations' => 'nullable|array',
         ]);
 
         $product = Product::create($validated);
@@ -63,7 +64,9 @@ class ProductController extends Controller
      */
     public function show(Product $product)
     {
-        return response()->json($product->load('category'));
+        $product->load('category');
+        $product->append(['average_rating', 'reviews_count']);
+        return response()->json($product);
     }
 
     /**
@@ -78,6 +81,7 @@ class ProductController extends Controller
             'stock' => 'integer|min:0',
             'image' => 'nullable|string',
             'category_id' => 'nullable|exists:categories,id',
+            'size_variations' => 'nullable|array',
         ]);
 
         $product->update($validated);

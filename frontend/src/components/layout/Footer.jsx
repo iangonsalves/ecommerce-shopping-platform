@@ -31,13 +31,13 @@ const Footer = () => {
             <Typography variant="h6" color="text.primary" gutterBottom>
               Quick Links
             </Typography>
-            <Link component={RouterLink} to="/products" color="inherit" display="block" sx={{ mb: 1 }}>
+            <Link component={RouterLink} to="/products" color="inherit" display="block" sx={{ mb: 1, textDecoration: 'none' }}>
               All Jerseys
             </Link>
-            <Link component={RouterLink} to="/leagues" color="inherit" display="block" sx={{ mb: 1 }}>
+            <Link component={RouterLink} to="/leagues" color="inherit" display="block" sx={{ mb: 1, textDecoration: 'none' }}>
               Leagues
             </Link>
-            <Link component={RouterLink} to="/cart" color="inherit" display="block" sx={{ mb: 1 }}>
+            <Link component={RouterLink} to="/cart" color="inherit" display="block" sx={{ mb: 1, textDecoration: 'none' }}>
               Cart
             </Link>
           </Grid>
