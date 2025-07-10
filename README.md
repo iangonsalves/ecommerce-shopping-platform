@@ -63,7 +63,7 @@ A specialized football/soccer jersey e-commerce platform built with Laravel and 
 
 ### Backend
 - Laravel 10
-- MySQL database
+- PostgreSQL database
 - JWT authentication
 - RESTful API
 
@@ -81,7 +81,7 @@ See individual README files in each directory for detailed documentation on setu
 ### Prerequisites
 - PHP 8.1 or higher
 - Node.js 16 or higher
-- MySQL
+- PostgreSQL
 - Composer
 - npm
 
