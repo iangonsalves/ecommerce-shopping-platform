@@ -23,6 +23,7 @@ A specialized football/soccer jersey e-commerce platform built with Laravel and 
   ![Homepage Screenshot](assets/homepage.png)
   ![Order History Screenshot](assets/order_history.png)
   ![Product Selection Screenshot](assets/product_section.png)
+  ![Product Detail Screenshot](assets/product_detail.png)
   ![Shopping Cart Screenshot](assets/shopping_cart.png)
   ![Admin Panel Screenshot](assets/admin_panel.png)
 
