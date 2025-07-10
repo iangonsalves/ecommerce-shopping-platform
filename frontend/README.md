@@ -1,16 +1,22 @@
-# E-commerce Platform Frontend
+# Alex's Jersey Hub Platform Frontend
 
-React-based frontend application for the e-commerce platform.
+React-based frontend application for Alex's Jersey Hub Platform.
 
 ## Features
 
 ### Core Features
 - User authentication (login/register)
 - Product browsing and search
-- Category navigation
+- League and club navigation (nested categories)
 - Shopping cart management
 - Order history tracking
 - Responsive design
+
+### Admin Features
+- Product Management: shows both club and league for each product
+- Category Management: set parent (league) for each club, display league names
+- Add/edit products: select a club (with league shown in parentheses)
+- Category dropdown in Product Management only shows clubs, grouped by league context
 
 ### Components
 - **Layout**: Navbar, Footer, PageContainer
@@ -18,6 +24,7 @@ React-based frontend application for the e-commerce platform.
 - **Cart**: CartIcon, Cart, CartItem
 - **Orders**: OrderHistory, OrderSuccess
 - **Auth**: Login, Register, ProtectedRoute
+- **Admin**: ProductManagement, CategoryManagement, UserManagement, OrderManagement, ReviewManagement
 
 ### State Management
 - AuthContext for user authentication
@@ -45,7 +52,13 @@ src/
 │   ├── Login.jsx
 │   ├── Register.jsx
 │   ├── OrderHistory.jsx
-│   └── OrderSuccess.jsx
+│   ├── OrderSuccess.jsx
+│   └── admin/
+│       ├── ProductManagement.jsx
+│       ├── CategoryManagement.jsx
+│       ├── UserManagement.jsx
+│       ├── OrderManagement.jsx
+│       └── ReviewManagement.jsx
 └── App.jsx
 ```
 
@@ -66,10 +79,8 @@ npm install
 2. Configure environment:
 ```bash
 cp .env.example .env
-# Set API_URL=http://localhost:8000/api
+# Set VITE_API_BASE_URL=http://localhost:8000
 ```
-
-Create a `.env` file in the `frontend`. Set the `VITE_API_BASE_URL` variable to the base URL of your backend application (e.g., `http://localhost:8000`). This URL is used for making API requests and fetching static assets like images from the backend's `public` directory.
 
 3. Start development server:
 ```bash
@@ -97,7 +108,12 @@ npm run dev
 ### Product Display
 - Grid layout
 - Search functionality
-- Category filtering
+- League and club filtering (nested categories)
+
+### Admin Management
+- Product Management: assign products to clubs, see league context
+- Category Management: set parent league for clubs, see league names
+- Category dropdown in Product Management only shows clubs, grouped by league
 
 ### Styling
 - Material-UI components
