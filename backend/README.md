@@ -124,6 +124,32 @@ For local development, product images are stored in the `backend/public/images` 
 - price
 - timestamps
 
+## Payments (Stripe Integration)
+
+Payments are implemented using Stripe PaymentIntents.
+
+Flow:
+
+1. Frontend calls `/create-payment-intent`
+2. Backend creates Stripe PaymentIntent using the Stripe secret key
+3. Backend returns `client_secret`
+4. Frontend confirms payment using Stripe.js
+
+Metadata stored:
+
+- user_id
+- cart_id
+- cart_total
+
+
+## Security & Authentication
+
+Authentication is implemented using Laravel Sanctum.
+
+Protected API routes use the `auth:sanctum` middleware.
+
+Admin functionality is protected using custom `admin` middleware which restricts access to management routes.
+
 ## API Endpoints
 
 ### Authentication
