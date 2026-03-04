@@ -45,6 +45,7 @@ A specialized football/soccer jersey e-commerce platform built with Laravel and 
 - Season filtering
 - Kit type selection
 - Stock management by size
+- Stripe PaymentIntent integration for secure checkout and payment processing
 
 ### Admin Management
 - Manage leagues (top-level categories)
@@ -52,6 +53,18 @@ A specialized football/soccer jersey e-commerce platform built with Laravel and 
 - Assign products to clubs (with league context shown in UI)
 - Product Management table shows both club and league for each product
 - Category Management allows setting a parent (league) for each club and displays league names
+
+## Architecture
+
+This project follows a decoupled frontend–backend architecture:
+
+React Frontend  
+↓  
+REST API  
+↓  
+Laravel Backend  
+↓  
+PostgreSQL Database
 
 ## Technical Stack
 

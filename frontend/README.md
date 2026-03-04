@@ -12,6 +12,12 @@ React-based frontend application for Alex's Jersey Hub Platform.
 - Order history tracking
 - Responsive design
 
+## API Integration
+
+The frontend communicates with the Laravel backend through REST API endpoints.
+
+API base URL is configured using environment variables and requests are handled through Axios.
+
 ### Admin Features
 - Product Management: shows both club and league for each product
 - Category Management: set parent (league) for each club, display league names
